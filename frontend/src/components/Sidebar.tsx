@@ -7,7 +7,8 @@ import {
   Settings, 
   Activity,
   Cpu,
-  Eye
+  Eye,
+  Video
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -22,6 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, alertCount })
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'devices', label: 'Devices', icon: Monitor },
     { id: 'detections', label: 'Detections', icon: ScanSearch },
+    { id: 'camera', label: 'Live Camera', icon: Video },
     { id: 'alerts', label: 'Alerts', icon: Bell, badge: alertCount },
   ];
 

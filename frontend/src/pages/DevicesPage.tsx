@@ -15,11 +15,33 @@ const DevicesPage: React.FC = () => {
     setLoading(true);
     try {
       const data = await devicesApi.getAll();
-      setDevices(data);
+      
+      // Check for local webcam device
+      const webcamDevice = localStorage.getItem('webcamDevice');
+      const webcamActive = localStorage.getItem('webcamActive') === 'true';
+      
+      let allDevices = [...data];
+      
+      if (webcamDevice && webcamActive) {
+        const webcamData = JSON.parse(webcamDevice);
+        // Add webcam device to the list
+        allDevices = [webcamData, ...data];
+      }
+      
+      setDevices(allDevices);
     } catch (error) {
       console.error('Failed to fetch devices:', error);
-      // Use mock data
-      setDevices(getMockDevices());
+      
+      // Even on error, check for webcam device
+      const webcamDevice = localStorage.getItem('webcamDevice');
+      const webcamActive = localStorage.getItem('webcamActive') === 'true';
+      
+      if (webcamDevice && webcamActive) {
+        const webcamData = JSON.parse(webcamDevice);
+        setDevices([webcamData]);
+      } else {
+        setDevices([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -27,6 +49,13 @@ const DevicesPage: React.FC = () => {
 
   useEffect(() => {
     fetchDevices();
+    
+    // Poll every 3 seconds to update webcam device status
+    const interval = setInterval(() => {
+      fetchDevices();
+    }, 3000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const filteredDevices = devices.filter(device => {
@@ -122,14 +151,6 @@ const DevicesPage: React.FC = () => {
   );
 };
 
-function getMockDevices(): IoTDevice[] {
-  return [
-    { id: 'edge-device-001', name: 'Factory Floor Camera 1', deviceType: 'Azure IoT Edge', status: 'online', lastSeen: new Date().toISOString(), location: 'Building A - Section 1', metrics: { cpuUsage: 45.5, memoryUsage: 62.3, temperature: 42.1, framesProcessed: 28450, inferenceLatency: 23.5, accuracy: 97.8 } },
-    { id: 'edge-device-002', name: 'Warehouse Entrance', deviceType: 'Azure IoT Edge', status: 'online', lastSeen: new Date().toISOString(), location: 'Warehouse - Main Entrance', metrics: { cpuUsage: 38.2, memoryUsage: 55.8, temperature: 38.7, framesProcessed: 21340, inferenceLatency: 19.8, accuracy: 98.2 } },
-    { id: 'edge-device-003', name: 'Quality Control Station', deviceType: 'Azure IoT Edge', status: 'online', lastSeen: new Date().toISOString(), location: 'Building B - QC Area', metrics: { cpuUsage: 78.9, memoryUsage: 71.2, temperature: 48.3, framesProcessed: 45670, inferenceLatency: 31.2, accuracy: 99.1 } },
-    { id: 'edge-device-004', name: 'Parking Lot Monitor', deviceType: 'Azure IoT Edge', status: 'offline', lastSeen: new Date(Date.now() - 7200000).toISOString(), location: 'Outdoor - Parking Area', metrics: { cpuUsage: 0, memoryUsage: 0, temperature: 0, framesProcessed: 12890, inferenceLatency: 0, accuracy: 95.6 } },
-    { id: 'edge-device-005', name: 'Assembly Line Camera', deviceType: 'Azure IoT Edge', status: 'online', lastSeen: new Date().toISOString(), location: 'Building A - Assembly Line', metrics: { cpuUsage: 52.1, memoryUsage: 58.9, temperature: 44.2, framesProcessed: 38920, inferenceLatency: 25.6, accuracy: 97.4 } },
-  ];
-}
 
 export default DevicesPage;
+

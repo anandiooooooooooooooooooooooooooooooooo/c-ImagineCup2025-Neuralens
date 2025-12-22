@@ -4,6 +4,8 @@ import Dashboard from './pages/Dashboard';
 import DevicesPage from './pages/DevicesPage';
 import DetectionsPage from './pages/DetectionsPage';
 import AlertsPage from './pages/AlertsPage';
+import SettingsPage from './pages/SettingsPage';
+import LiveCameraPage from './pages/LiveCameraPage';
 import { alertsApi } from './services/api';
 import './App.css';
 
@@ -37,8 +39,10 @@ function App() {
         return <DetectionsPage />;
       case 'alerts':
         return <AlertsPage />;
+      case 'camera':
+        return <LiveCameraPage />;
       case 'settings':
-        return <SettingsPlaceholder />;
+        return <SettingsPage />;
       default:
         return <Dashboard />;
     }
@@ -57,30 +61,5 @@ function App() {
     </div>
   );
 }
-
-const SettingsPlaceholder: React.FC = () => (
-  <div className="settings-placeholder">
-    <h1>Settings</h1>
-    <p>Settings page coming soon...</p>
-    <div className="settings-grid">
-      <div className="settings-card card">
-        <h3>Azure Configuration</h3>
-        <p>Configure your Azure IoT Hub, Blob Storage, and Cosmos DB connections.</p>
-      </div>
-      <div className="settings-card card">
-        <h3>Notification Preferences</h3>
-        <p>Manage alert thresholds and notification settings.</p>
-      </div>
-      <div className="settings-card card">
-        <h3>Model Management</h3>
-        <p>Update and deploy AI models to edge devices.</p>
-      </div>
-      <div className="settings-card card">
-        <h3>User Management</h3>
-        <p>Manage user access and permissions.</p>
-      </div>
-    </div>
-  </div>
-);
 
 export default App;

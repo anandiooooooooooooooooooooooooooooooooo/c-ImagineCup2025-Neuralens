@@ -18,7 +18,7 @@ const AlertsPage: React.FC = () => {
       setAlerts(data);
     } catch (error) {
       console.error('Failed to fetch alerts:', error);
-      setAlerts(getMockAlerts());
+      setAlerts([]);
     } finally {
       setLoading(false);
     }
@@ -180,15 +180,6 @@ const AlertsPage: React.FC = () => {
   );
 };
 
-function getMockAlerts(): Alert[] {
-  return [
-    { id: '1', deviceId: 'edge-device-001', severity: 'critical', title: 'Safety Violation Detected', message: 'Person detected without safety helmet in restricted zone. Immediate action required.', timestamp: new Date(Date.now() - 300000).toISOString(), isRead: false, isResolved: false },
-    { id: '2', deviceId: 'edge-device-004', severity: 'warning', title: 'Device Offline', message: 'Parking Lot Monitor has been offline for 2 hours. Check network connectivity.', timestamp: new Date(Date.now() - 7200000).toISOString(), isRead: false, isResolved: false },
-    { id: '3', deviceId: 'edge-device-003', severity: 'warning', title: 'High CPU Usage', message: 'Quality Control Station CPU usage exceeded 75% threshold.', timestamp: new Date(Date.now() - 1800000).toISOString(), isRead: true, isResolved: false },
-    { id: '4', deviceId: 'edge-device-002', severity: 'info', title: 'Model Updated', message: 'ONNX model successfully updated to version 2.3.1 on Warehouse Entrance device.', timestamp: new Date(Date.now() - 14400000).toISOString(), isRead: true, isResolved: false },
-    { id: '5', deviceId: 'edge-device-005', severity: 'critical', title: 'Unauthorized Access', message: 'Unauthorized person detected in assembly line area after hours.', timestamp: new Date(Date.now() - 600000).toISOString(), isRead: false, isResolved: false },
-    { id: '6', deviceId: 'edge-device-001', severity: 'info', title: 'System Maintenance', message: 'Scheduled maintenance completed successfully. All systems operational.', timestamp: new Date(Date.now() - 28800000).toISOString(), isRead: true, isResolved: false },
-  ];
-}
 
 export default AlertsPage;
+

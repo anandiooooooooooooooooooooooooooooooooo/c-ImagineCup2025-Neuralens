@@ -21,100 +21,7 @@ public class IoTHubService : IIoTHubService
     private readonly ServiceClient? _serviceClient;
     private readonly bool _isConfigured;
 
-    // Mock data for demo when Azure is not configured
-    private readonly List<EdgeDevice> _mockDevices = new()
-    {
-        new EdgeDevice
-        {
-            Id = "edge-device-001",
-            Name = "Factory Floor Camera 1",
-            DeviceType = "Azure IoT Edge",
-            Status = "online",
-            LastSeen = DateTime.UtcNow.AddMinutes(-1),
-            Location = "Building A - Section 1",
-            Metrics = new DeviceMetrics
-            {
-                CpuUsage = 45.5,
-                MemoryUsage = 62.3,
-                Temperature = 42.1,
-                FramesProcessed = 28450,
-                InferenceLatency = 23.5,
-                Accuracy = 97.8
-            }
-        },
-        new EdgeDevice
-        {
-            Id = "edge-device-002",
-            Name = "Warehouse Entrance Camera",
-            DeviceType = "Azure IoT Edge",
-            Status = "online",
-            LastSeen = DateTime.UtcNow.AddMinutes(-2),
-            Location = "Warehouse - Main Entrance",
-            Metrics = new DeviceMetrics
-            {
-                CpuUsage = 38.2,
-                MemoryUsage = 55.8,
-                Temperature = 38.7,
-                FramesProcessed = 21340,
-                InferenceLatency = 19.8,
-                Accuracy = 98.2
-            }
-        },
-        new EdgeDevice
-        {
-            Id = "edge-device-003",
-            Name = "Quality Control Station",
-            DeviceType = "Azure IoT Edge",
-            Status = "online",
-            LastSeen = DateTime.UtcNow,
-            Location = "Building B - QC Area",
-            Metrics = new DeviceMetrics
-            {
-                CpuUsage = 78.9,
-                MemoryUsage = 71.2,
-                Temperature = 48.3,
-                FramesProcessed = 45670,
-                InferenceLatency = 31.2,
-                Accuracy = 99.1
-            }
-        },
-        new EdgeDevice
-        {
-            Id = "edge-device-004",
-            Name = "Parking Lot Monitor",
-            DeviceType = "Azure IoT Edge",
-            Status = "offline",
-            LastSeen = DateTime.UtcNow.AddHours(-2),
-            Location = "Outdoor - Parking Area",
-            Metrics = new DeviceMetrics
-            {
-                CpuUsage = 0,
-                MemoryUsage = 0,
-                Temperature = 0,
-                FramesProcessed = 12890,
-                InferenceLatency = 0,
-                Accuracy = 95.6
-            }
-        },
-        new EdgeDevice
-        {
-            Id = "edge-device-005",
-            Name = "Assembly Line Camera",
-            DeviceType = "Azure IoT Edge",
-            Status = "online",
-            LastSeen = DateTime.UtcNow.AddSeconds(-30),
-            Location = "Building A - Assembly Line",
-            Metrics = new DeviceMetrics
-            {
-                CpuUsage = 52.1,
-                MemoryUsage = 58.9,
-                Temperature = 44.2,
-                FramesProcessed = 38920,
-                InferenceLatency = 25.6,
-                Accuracy = 97.4
-            }
-        }
-    };
+
 
     public IoTHubService(ILogger<IoTHubService> logger, IConfiguration configuration)
     {
@@ -148,7 +55,7 @@ public class IoTHubService : IIoTHubService
     {
         if (!_isConfigured || _registryManager == null)
         {
-            return _mockDevices;
+            return new List<EdgeDevice>();
         }
 
         try
@@ -170,7 +77,7 @@ public class IoTHubService : IIoTHubService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching devices from IoT Hub");
-            return _mockDevices;
+            return new List<EdgeDevice>();
         }
     }
 
@@ -178,7 +85,7 @@ public class IoTHubService : IIoTHubService
     {
         if (!_isConfigured || _registryManager == null)
         {
-            return _mockDevices.FirstOrDefault(d => d.Id == deviceId);
+            return null;
         }
 
         try
@@ -189,7 +96,7 @@ public class IoTHubService : IIoTHubService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching device {DeviceId}", deviceId);
-            return _mockDevices.FirstOrDefault(d => d.Id == deviceId);
+            return null;
         }
     }
 

@@ -25,8 +25,8 @@ const DetectionsPage: React.FC = () => {
       setSummary(summaryData);
     } catch (error) {
       console.error('Failed to fetch detections:', error);
-      setDetections(getMockDetections());
-      setSummary(getMockSummary());
+      setDetections([]);
+      setSummary([]);
     } finally {
       setLoading(false);
     }
@@ -145,30 +145,6 @@ const DetectionsPage: React.FC = () => {
   );
 };
 
-function getMockDetections(): DetectionResult[] {
-  const types = ['Person', 'Vehicle', 'Package', 'Safety Helmet', 'Forklift', 'Safety Vest', 'Face Mask'];
-  const devices = ['edge-device-001', 'edge-device-002', 'edge-device-003', 'edge-device-005'];
-  
-  return Array.from({ length: 24 }, (_, i) => ({
-    id: `det-${i}`,
-    deviceId: devices[i % devices.length],
-    timestamp: new Date(Date.now() - i * 300000).toISOString(),
-    objectType: types[i % types.length],
-    confidence: 85 + Math.random() * 15,
-    imageUrl: `https://picsum.photos/seed/${i + 100}/640/480`,
-  }));
-}
-
-function getMockSummary(): DetectionSummary[] {
-  return [
-    { objectType: 'Person', count: 245, averageConfidence: 96.5 },
-    { objectType: 'Vehicle', count: 156, averageConfidence: 94.2 },
-    { objectType: 'Package', count: 89, averageConfidence: 92.8 },
-    { objectType: 'Safety Helmet', count: 67, averageConfidence: 97.1 },
-    { objectType: 'Forklift', count: 45, averageConfidence: 95.4 },
-    { objectType: 'Safety Vest', count: 34, averageConfidence: 93.7 },
-    { objectType: 'Face Mask', count: 28, averageConfidence: 91.2 },
-  ];
-}
 
 export default DetectionsPage;
+
