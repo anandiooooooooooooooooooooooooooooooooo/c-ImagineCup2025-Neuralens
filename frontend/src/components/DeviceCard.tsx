@@ -10,6 +10,7 @@ interface DeviceCardProps {
 
 const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
   const isOnline = device.status === 'online';
+  const isWebcam = device.deviceType === 'Browser WebRTC';
 
   const getProgressClass = (value: number) => {
     if (value < 50) return 'low';
@@ -18,10 +19,15 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
   };
 
   return (
-    <div className={`device-card card ${device.status}`} onClick={onClick}>
+    <div className={`device-card card ${device.status} ${isWebcam ? 'webcam-device' : ''}`} onClick={onClick}>
       <div className="device-header">
         <div className="device-info">
-          <h4 className="device-name">{device.name}</h4>
+          <h4 className="device-name">
+            {device.name}
+            {isWebcam && isOnline && (
+              <span className="live-badge">🔴 LIVE</span>
+            )}
+          </h4>
           <div className="device-location">
             <MapPin size={12} />
             <span>{device.location}</span>
