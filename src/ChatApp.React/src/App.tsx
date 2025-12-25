@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. Licensed under the MIT License.
 // Modified for NeuraLens ADHD/ASD Early Detection System
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FluentProvider, webDarkTheme } from '@fluentui/react-components';
 import {
   Brain,
@@ -15,6 +15,7 @@ import {
   CheckCircle,
   Upload,
   BarChart3,
+  Loader2,
 } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import {
@@ -43,41 +44,98 @@ ChartJS.register(
   Filler
 );
 
-// Mock data for demonstration
-const mockDashboardData = {
-  totalSessions: 24,
-  totalStudents: 156,
-  highRiskCount: 8,
-  mediumRiskCount: 23,
-  lowRiskCount: 125,
-  averageAttention: 72,
-  averageMovement: 45,
-};
+// API Configuration
+const API_BASE_URL = 'http://localhost:3000/api';
 
-const mockTimelineData = {
-  labels: ['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00'],
-  datasets: [
-    {
-      label: 'Attention Level',
-      data: [65, 72, 68, 75, 70, 78, 74],
-      borderColor: 'rgb(37, 99, 235)',
-      backgroundColor: 'rgba(37, 99, 235, 0.1)',
-      fill: true,
-      tension: 0.4,
-    },
-    {
-      label: 'Movement Intensity',
-      data: [45, 52, 48, 55, 50, 58, 54],
-      borderColor: 'rgb(249, 115, 22)',
-      backgroundColor: 'rgba(249, 115, 22, 0.1)',
-      fill: true,
-      tension: 0.4,
-    },
-  ],
-};
+// Types
+interface DashboardStats {
+  totalSessions: number;
+  totalStudentsMonitored: number;
+  highRiskCount: number;
+  mediumRiskCount: number;
+  lowRiskCount: number;
+  averageClassroomAttention: number;
+  averageClassroomMovement: number;
+}
 
 function App() {
   const [activeView, setActiveView] = useState<'dashboard' | 'upload' | 'analytics'>('dashboard');
+  const [dashboardData, setDashboardData] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Fetch dashboard data on mount
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // For now, use default values since we don't have a dashboard stats endpoint yet
+      // TODO: Replace with actual API call when endpoint is ready
+      setDashboardData({
+        totalSessions: 0,
+        totalStudentsMonitored: 0,
+        highRiskCount: 0,
+        mediumRiskCount: 0,
+        lowRiskCount: 0,
+        averageClassroomAttention: 0,
+        averageClassroomMovement: 0,
+      });
+      
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError('Failed to load dashboard data');
+      setLoading(false);
+    }
+  };
+
+  const handleVideoUpload = async (file: File) => {
+    try {
+      setIsUploading(true);
+      setUploadProgress(0);
+      setError(null);
+
+      const formData = new FormData();
+      formData.append('video', file);
+      formData.append('sessionId', `session-${Date.now()}`);
+      formData.append('className', 'Demo Class');
+      formData.append('activityType', 'Lecture');
+
+      const response = await fetch(`${API_BASE_URL}/behavioral-analytics/process-video`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Upload successful:', result);
+      
+      setUploadProgress(100);
+      alert(`Video processed successfully! ${result.studentsAnalyzed} students analyzed.`);
+      
+      // Refresh dashboard data
+      await fetchDashboardData();
+      
+      // Switch to dashboard view
+      setActiveView('dashboard');
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -96,6 +154,10 @@ function App() {
       opacity: 1,
     },
   };
+
+  const totalStudents = dashboardData 
+    ? dashboardData.highRiskCount + dashboardData.mediumRiskCount + dashboardData.lowRiskCount 
+    : 0;
 
   return (
     <FluentProvider theme={webDarkTheme}>
@@ -163,147 +225,151 @@ function App() {
         {/* Main Content */}
         <main style={{ padding: '2rem' }}>
           <div className="container">
+            {/* Error Display */}
+            {error && (
+              <div
+                style={{
+                  padding: '1rem 1.5rem',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid var(--danger)',
+                  borderRadius: 'var(--radius-lg)',
+                  marginBottom: '2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1rem',
+                }}
+              >
+                <AlertTriangle size={20} color="var(--danger)" />
+                <div>
+                  <strong style={{ color: 'var(--danger)' }}>Error</strong>
+                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem' }}>{error}</p>
+                </div>
+              </div>
+            )}
+
             {activeView === 'dashboard' && (
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
               >
-                {/* Stats Grid */}
-                <motion.div
-                  variants={itemVariants}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                    gap: '1.5rem',
-                    marginBottom: '2rem',
-                  }}
-                >
-                  <StatsCard
-                    title="Total Sessions"
-                    value={mockDashboardData.totalSessions}
-                    icon={<Video size={24} />}
-                    gradient="var(--gradient-primary)"
-                    trend="+12% from last week"
-                  />
-                  <StatsCard
-                    title="Students Monitored"
-                    value={mockDashboardData.totalStudents}
-                    icon={<Users size={24} />}
-                    gradient="var(--gradient-purple)"
-                    trend="+8 new students"
-                  />
-                  <StatsCard
-                    title="High Risk Indicators"
-                    value={mockDashboardData.highRiskCount}
-                    icon={<AlertTriangle size={24} />}
-                    gradient="var(--gradient-danger)"
-                    trend="Requires attention"
-                  />
-                  <StatsCard
-                    title="Average Attention"
-                    value={`${mockDashboardData.averageAttention}%`}
-                    icon={<Eye size={24} />}
-                    gradient="var(--gradient-success)"
-                    trend="+5% improvement"
-                  />
-                </motion.div>
-
-                {/* Risk Distribution */}
-                <motion.div variants={itemVariants} className="card" style={{ marginBottom: '2rem' }}>
-                  <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Risk Level Distribution</h2>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <RiskBar
-                      label="Low Risk"
-                      count={mockDashboardData.lowRiskCount}
-                      total={mockDashboardData.totalStudents}
-                      color="var(--success)"
-                      icon={<CheckCircle size={16} />}
-                    />
-                    <RiskBar
-                      label="Medium Risk"
-                      count={mockDashboardData.mediumRiskCount}
-                      total={mockDashboardData.totalStudents}
-                      color="var(--warning)"
-                      icon={<Activity size={16} />}
-                    />
-                    <RiskBar
-                      label="High Risk"
-                      count={mockDashboardData.highRiskCount}
-                      total={mockDashboardData.totalStudents}
-                      color="var(--danger)"
-                      icon={<AlertTriangle size={16} />}
-                    />
+                {loading ? (
+                  <div style={{ textAlign: 'center', padding: '4rem' }}>
+                    <Loader2 size={48} className="spinner" style={{ margin: '0 auto 1rem' }} />
+                    <p>Loading dashboard data...</p>
                   </div>
-                </motion.div>
+                ) : dashboardData ? (
+                  <>
+                    {/* Stats Grid */}
+                    <motion.div
+                      variants={itemVariants}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                        gap: '1.5rem',
+                        marginBottom: '2rem',
+                      }}
+                    >
+                      <StatsCard
+                        title="Total Sessions"
+                        value={dashboardData.totalSessions}
+                        icon={<Video size={24} />}
+                        gradient="var(--gradient-primary)"
+                        trend={dashboardData.totalSessions === 0 ? "No sessions yet" : "+12% from last week"}
+                      />
+                      <StatsCard
+                        title="Students Monitored"
+                        value={dashboardData.totalStudentsMonitored}
+                        icon={<Users size={24} />}
+                        gradient="var(--gradient-purple)"
+                        trend={dashboardData.totalStudentsMonitored === 0 ? "Upload a video to start" : "+8 new students"}
+                      />
+                      <StatsCard
+                        title="High Risk Indicators"
+                        value={dashboardData.highRiskCount}
+                        icon={<AlertTriangle size={24} />}
+                        gradient="var(--gradient-danger)"
+                        trend={dashboardData.highRiskCount === 0 ? "No high risk detected" : "Requires attention"}
+                      />
+                      <StatsCard
+                        title="Average Attention"
+                        value={dashboardData.averageClassroomAttention > 0 ? `${Math.round(dashboardData.averageClassroomAttention)}%` : "N/A"}
+                        icon={<Eye size={24} />}
+                        gradient="var(--gradient-success)"
+                        trend={dashboardData.averageClassroomAttention === 0 ? "No data yet" : "+5% improvement"}
+                      />
+                    </motion.div>
 
-                {/* Timeline Chart */}
-                <motion.div variants={itemVariants} className="card">
-                  <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
-                    Behavioral Trends - Today
-                  </h2>
-                  <Line
-                    data={mockTimelineData}
-                    options={{
-                      responsive: true,
-                      plugins: {
-                        legend: {
-                          position: 'top' as const,
-                          labels: {
-                            color: 'var(--dark-text-primary)',
-                            font: {
-                              family: 'var(--font-sans)',
-                            },
-                          },
-                        },
-                      },
-                      scales: {
-                        y: {
-                          beginAtZero: true,
-                          max: 100,
-                          grid: {
-                            color: 'rgba(255, 255, 255, 0.05)',
-                          },
-                          ticks: {
-                            color: 'var(--dark-text-secondary)',
-                          },
-                        },
-                        x: {
-                          grid: {
-                            color: 'rgba(255, 255, 255, 0.05)',
-                          },
-                          ticks: {
-                            color: 'var(--dark-text-secondary)',
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </motion.div>
+                    {/* Risk Distribution */}
+                    {totalStudents > 0 && (
+                      <motion.div variants={itemVariants} className="card" style={{ marginBottom: '2rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Risk Level Distribution</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          <RiskBar
+                            label="Low Risk"
+                            count={dashboardData.lowRiskCount}
+                            total={totalStudents}
+                            color="var(--success)"
+                            icon={<CheckCircle size={16} />}
+                          />
+                          <RiskBar
+                            label="Medium Risk"
+                            count={dashboardData.mediumRiskCount}
+                            total={totalStudents}
+                            color="var(--warning)"
+                            icon={<Activity size={16} />}
+                          />
+                          <RiskBar
+                            label="High Risk"
+                            count={dashboardData.highRiskCount}
+                            total={totalStudents}
+                            color="var(--danger)"
+                            icon={<AlertTriangle size={16} />}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
 
-                {/* Privacy Notice */}
-                <motion.div
-                  variants={itemVariants}
-                  style={{
-                    marginTop: '2rem',
-                    padding: '1rem 1.5rem',
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid var(--danger)',
-                    borderRadius: 'var(--radius-lg)',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '1rem',
-                  }}
-                >
-                  <AlertTriangle size={20} color="var(--danger)" />
-                  <div>
-                    <strong style={{ color: 'var(--danger)' }}>Non-Diagnostic System</strong>
-                    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem' }}>
-                      This system provides behavioral observations only. All risk indicators require
-                      professional assessment by licensed clinicians. Do not use for medical diagnosis.
-                    </p>
-                  </div>
-                </motion.div>
+                    {/* Empty State */}
+                    {totalStudents === 0 && (
+                      <motion.div variants={itemVariants} className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+                        <Upload size={64} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
+                        <h2>No Data Available</h2>
+                        <p style={{ color: 'var(--dark-text-secondary)', marginBottom: '2rem' }}>
+                          Upload a classroom video to start analyzing behavioral patterns
+                        </p>
+                        <button className="btn btn-primary" onClick={() => setActiveView('upload')}>
+                          <Upload size={16} />
+                          Upload Your First Video
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {/* Privacy Notice */}
+                    <motion.div
+                      variants={itemVariants}
+                      style={{
+                        marginTop: '2rem',
+                        padding: '1rem 1.5rem',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid var(--danger)',
+                        borderRadius: 'var(--radius-lg)',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '1rem',
+                      }}
+                    >
+                      <AlertTriangle size={20} color="var(--danger)" />
+                      <div>
+                        <strong style={{ color: 'var(--danger)' }}>Non-Diagnostic System</strong>
+                        <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem' }}>
+                          This system provides behavioral observations only. All risk indicators require
+                          professional assessment by licensed clinicians. Do not use for medical diagnosis.
+                        </p>
+                      </div>
+                    </motion.div>
+                  </>
+                ) : null}
               </motion.div>
             )}
 
@@ -315,36 +381,69 @@ function App() {
                 style={{ maxWidth: '600px', margin: '0 auto' }}
               >
                 <h2>Upload Classroom Video</h2>
-                <div
+                <p style={{ color: 'var(--dark-text-secondary)', marginBottom: '1.5rem' }}>
+                  Upload a video to analyze behavioral patterns and detect risk indicators
+                </p>
+                
+                <input
+                  type="file"
+                  accept="video/*"
+                  id="video-upload"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleVideoUpload(file);
+                    }
+                  }}
+                  disabled={isUploading}
+                />
+                
+                <label
+                  htmlFor="video-upload"
                   style={{
+                    display: 'block',
                     border: '2px dashed rgba(255, 255, 255, 0.2)',
                     borderRadius: 'var(--radius-lg)',
                     padding: '3rem',
                     textAlign: 'center',
-                    cursor: 'pointer',
+                    cursor: isUploading ? 'not-allowed' : 'pointer',
                     transition: 'all var(--transition-base)',
+                    opacity: isUploading ? 0.5 : 1,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--primary-blue)';
-                    e.currentTarget.style.background = 'rgba(37, 99, 235, 0.05)';
+                    if (!isUploading) {
+                      e.currentTarget.style.borderColor = 'var(--primary-blue)';
+                      e.currentTarget.style.background = 'rgba(37, 99, 235, 0.05)';
+                    }
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
                     e.currentTarget.style.background = 'transparent';
                   }}
                 >
-                  <Upload size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                  <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>
-                    Drop your video here or click to browse
-                  </p>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--dark-text-muted)' }}>
-                    Supported formats: MP4, AVI, MOV (Max 500MB)
-                  </p>
-                </div>
-                <button className="btn btn-primary" style={{ width: '100%', marginTop: '1.5rem' }}>
-                  <Video size={16} />
-                  Start Processing
-                </button>
+                  {isUploading ? (
+                    <>
+                      <Loader2 size={48} className="spinner" style={{ margin: '0 auto 1rem' }} />
+                      <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>
+                        Processing video... {uploadProgress}%
+                      </p>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--dark-text-muted)' }}>
+                        This may take a few minutes
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+                      <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>
+                        Drop your video here or click to browse
+                      </p>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--dark-text-muted)' }}>
+                        Supported formats: MP4, AVI, MOV (Max 500MB)
+                      </p>
+                    </>
+                  )}
+                </label>
               </motion.div>
             )}
 
@@ -435,7 +534,7 @@ function RiskBar({
   color: string;
   icon: React.ReactNode;
 }) {
-  const percentage = (count / total) * 100;
+  const percentage = total > 0 ? (count / total) * 100 : 0;
 
   return (
     <div>
