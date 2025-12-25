@@ -1,0 +1,128 @@
+name: Code Quality Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ develop ]
+
+jobs:
+  # Frontend Code Quality
+  frontend-quality:
+    name: Frontend Code Quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/ChatApp.React
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: ./src/ChatApp.React/package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Run Prettier check
+        run: npx prettier --check src
+        continue-on-error: true
+      
+      - name: Type check
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+  # Backend Code Quality
+  backend-quality:
+    name: Backend Code Quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/ChatApp.WebApi
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Run code analysis
+        run: dotnet format --verify-no-changes --verbosity diagnostic
+        continue-on-error: true
+
+  # Python Code Quality
+  python-quality:
+    name: Python Code Quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/cv-engine
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black mypy
+          pip install -r requirements.txt
+      
+      - name: Run Flake8
+        run: flake8 src --count --statistics
+        continue-on-error: true
+      
+      - name: Run Black
+        run: black --check src
+        continue-on-error: true
+      
+      - name: Run MyPy
+        run: mypy src --ignore-missing-imports
+        continue-on-error: true
+
+  # Security Scan
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+        continue-on-error: true
