@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. Licensed under the MIT License.
 // Modified for NeuraLens ADHD/ASD Early Detection System
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FluentProvider, webDarkTheme } from '@fluentui/react-components';
 import {
   Brain,
