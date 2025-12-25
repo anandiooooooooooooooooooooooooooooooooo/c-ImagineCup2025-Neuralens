@@ -1,7 +1,7 @@
 {
-  "name": "chat-sample-react",
+  "name": "neuralens-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,19 +13,18 @@
   },
   "dependencies": {
     "@fluentui/react-components": "9.56.8",
-    "@microsoft/ai-chat-protocol": "^1.0.0-beta.20240814.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-markdown": "^9.0.3",
-    "react-syntax-highlighter": "^15.6.1",
-    "react-textarea-autosize": "^8.5.6",
-    "remark-gfm": "^4.0.0"
+    "chart.js": "^4.4.1",
+    "react-chartjs-2": "^5.2.0",
+    "lucide-react": "^0.344.0",
+    "framer-motion": "^11.0.5",
+    "date-fns": "^3.3.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "@vitejs/plugin-react": "^4.3.4",
