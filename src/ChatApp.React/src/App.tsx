@@ -329,7 +329,7 @@ function App() {
                         </p>
                         <label htmlFor="video-upload-empty" className="btn btn-primary" style={{ cursor: 'pointer' }}>
                           <Upload size={16} />
-                          Upload Your First Video
+                          Upload Classroom Recorded Video
                         </label>
                         <input
                           type="file"
