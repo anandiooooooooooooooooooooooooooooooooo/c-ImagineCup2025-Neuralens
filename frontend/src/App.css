@@ -1,0 +1,54 @@
+/* App-specific styles */
+
+.settings-placeholder {
+  animation: fadeIn 0.4s ease;
+}
+
+.settings-placeholder h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.settings-placeholder > p {
+  color: var(--text-muted);
+  margin-bottom: var(--space-xl);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.settings-card {
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.settings-card:hover {
+  transform: translateY(-4px);
+}
+
+.settings-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+  color: var(--accent-primary-light);
+}
+
+.settings-card p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}

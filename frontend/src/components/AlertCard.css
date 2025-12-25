@@ -1,0 +1,126 @@
+.alert-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  position: relative;
+  transition: all var(--transition-normal);
+}
+
+.alert-card.unread {
+  background: var(--bg-card-hover);
+}
+
+.alert-card.read {
+  opacity: 0.7;
+}
+
+.alert-card:hover {
+  opacity: 1;
+}
+
+.alert-critical {
+  border-left: 3px solid var(--accent-danger);
+}
+
+.alert-warning {
+  border-left: 3px solid var(--accent-warning);
+}
+
+.alert-info {
+  border-left: 3px solid var(--accent-secondary);
+}
+
+.alert-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.alert-critical .alert-icon-wrapper {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-danger);
+}
+
+.alert-warning .alert-icon-wrapper {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-warning);
+}
+
+.alert-info .alert-icon-wrapper {
+  background: rgba(34, 211, 238, 0.15);
+  color: var(--accent-secondary);
+}
+
+.alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.alert-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.alert-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.alert-message {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+  line-height: 1.5;
+}
+
+.alert-device {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.alert-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.alert-action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.alert-action-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--accent-primary);
+}
+
+.alert-action-btn.resolve:hover {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-success);
+}

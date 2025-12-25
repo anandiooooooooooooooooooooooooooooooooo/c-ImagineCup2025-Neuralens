@@ -1,0 +1,6 @@
+@NeuraLens.Api_HostAddress = http://localhost:5208
+
+GET {{NeuraLens.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
