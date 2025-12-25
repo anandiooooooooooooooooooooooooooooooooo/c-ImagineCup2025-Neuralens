@@ -59,7 +59,7 @@ interface DashboardStats {
 }
 
 function App() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'upload' | 'analytics'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'analytics'>('dashboard');
   const [dashboardData, setDashboardData] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -205,13 +205,6 @@ function App() {
                 Dashboard
               </button>
               <button
-                className={`btn ${activeView === 'upload' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => setActiveView('upload')}
-              >
-                <Upload size={16} />
-                Upload Video
-              </button>
-              <button
                 className={`btn ${activeView === 'analytics' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setActiveView('analytics')}
               >
@@ -273,29 +266,25 @@ function App() {
                       <StatsCard
                         title="Total Sessions"
                         value={dashboardData.totalSessions}
-                        icon={<Video size={24} />}
-                        gradient="var(--gradient-primary)"
+                        icon={<Video size={20} />}
                         trend={dashboardData.totalSessions === 0 ? "No sessions yet" : "+12% from last week"}
                       />
                       <StatsCard
                         title="Students Monitored"
                         value={dashboardData.totalStudentsMonitored}
-                        icon={<Users size={24} />}
-                        gradient="var(--gradient-purple)"
+                        icon={<Users size={20} />}
                         trend={dashboardData.totalStudentsMonitored === 0 ? "Upload a video to start" : "+8 new students"}
                       />
                       <StatsCard
                         title="High Risk Indicators"
                         value={dashboardData.highRiskCount}
-                        icon={<AlertTriangle size={24} />}
-                        gradient="var(--gradient-danger)"
+                        icon={<AlertTriangle size={20} />}
                         trend={dashboardData.highRiskCount === 0 ? "No high risk detected" : "Requires attention"}
                       />
                       <StatsCard
                         title="Average Attention"
                         value={dashboardData.averageClassroomAttention > 0 ? `${Math.round(dashboardData.averageClassroomAttention)}%` : "N/A"}
-                        icon={<Eye size={24} />}
-                        gradient="var(--gradient-success)"
+                        icon={<Eye size={20} />}
                         trend={dashboardData.averageClassroomAttention === 0 ? "No data yet" : "+5% improvement"}
                       />
                     </motion.div>
@@ -338,10 +327,23 @@ function App() {
                         <p style={{ color: 'var(--dark-text-secondary)', marginBottom: '2rem' }}>
                           Upload a classroom video to start analyzing behavioral patterns
                         </p>
-                        <button className="btn btn-primary" onClick={() => setActiveView('upload')}>
+                        <label htmlFor="video-upload-empty" className="btn btn-primary" style={{ cursor: 'pointer' }}>
                           <Upload size={16} />
                           Upload Your First Video
-                        </button>
+                        </label>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          id="video-upload-empty"
+                          style={{ display: 'none' }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleVideoUpload(file);
+                            }
+                          }}
+                          disabled={isUploading}
+                        />
                       </motion.div>
                     )}
 
@@ -373,79 +375,7 @@ function App() {
               </motion.div>
             )}
 
-            {activeView === 'upload' && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="card"
-                style={{ maxWidth: '600px', margin: '0 auto' }}
-              >
-                <h2>Upload Classroom Video</h2>
-                <p style={{ color: 'var(--dark-text-secondary)', marginBottom: '1.5rem' }}>
-                  Upload a video to analyze behavioral patterns and detect risk indicators
-                </p>
-                
-                <input
-                  type="file"
-                  accept="video/*"
-                  id="video-upload"
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      handleVideoUpload(file);
-                    }
-                  }}
-                  disabled={isUploading}
-                />
-                
-                <label
-                  htmlFor="video-upload"
-                  style={{
-                    display: 'block',
-                    border: '2px dashed rgba(255, 255, 255, 0.2)',
-                    borderRadius: 'var(--radius-lg)',
-                    padding: '3rem',
-                    textAlign: 'center',
-                    cursor: isUploading ? 'not-allowed' : 'pointer',
-                    transition: 'all var(--transition-base)',
-                    opacity: isUploading ? 0.5 : 1,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isUploading) {
-                      e.currentTarget.style.borderColor = 'var(--primary-blue)';
-                      e.currentTarget.style.background = 'rgba(37, 99, 235, 0.05)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader2 size={48} className="spinner" style={{ margin: '0 auto 1rem' }} />
-                      <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>
-                        Processing video... {uploadProgress}%
-                      </p>
-                      <p style={{ fontSize: '0.875rem', color: 'var(--dark-text-muted)' }}>
-                        This may take a few minutes
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <Upload size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                      <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>
-                        Drop your video here or click to browse
-                      </p>
-                      <p style={{ fontSize: '0.875rem', color: 'var(--dark-text-muted)' }}>
-                        Supported formats: MP4, AVI, MOV (Max 500MB)
-                      </p>
-                    </>
-                  )}
-                </label>
-              </motion.div>
-            )}
+
 
             {activeView === 'analytics' && (
               <motion.div
@@ -471,46 +401,34 @@ function StatsCard({
   title,
   value,
   icon,
-  gradient,
   trend,
 }: {
   title: string;
   value: number | string;
   icon: React.ReactNode;
-  gradient: string;
   trend: string;
 }) {
   return (
-    <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '100px',
-          height: '100px',
-          background: gradient,
-          opacity: 0.1,
-          borderRadius: '50%',
-          filter: 'blur(40px)',
-        }}
-      />
+    <div className="card">
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <p style={{ fontSize: '0.875rem', color: 'var(--dark-text-muted)', margin: '0 0 0.5rem 0' }}>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: '0 0 0.5rem 0' }}>
             {title}
           </p>
-          <h3 style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>{value}</h3>
-          <p style={{ fontSize: '0.75rem', color: 'var(--dark-text-secondary)', margin: 0 }}>
+          <h3 style={{ fontSize: '2rem', margin: '0 0 0.5rem 0', fontWeight: 700 }}>{value}</h3>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
             {trend}
           </p>
         </div>
         <div
           style={{
-            background: gradient,
-            padding: '0.75rem',
-            borderRadius: 'var(--radius-lg)',
-            color: 'white',
+            background: 'var(--white)',
+            padding: '0.625rem',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--black)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {icon}
