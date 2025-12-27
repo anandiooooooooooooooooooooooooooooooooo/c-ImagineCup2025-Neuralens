@@ -1,5 +1,6 @@
 using Microsoft.Azure.Cosmos;
 using NeuraLens.Api.Domain;
+using NeuraLens.Api.Models;
 
 namespace NeuraLens.Api.Services;
 
@@ -13,6 +14,12 @@ public interface ICosmosDbService
     Task<Alert> SaveAlertAsync(Alert alert);
     Task<bool> MarkAlertAsReadAsync(string alertId);
     Task<bool> ResolveAlertAsync(string alertId);
+
+    // New methods for NeuraLens behavioral analytics
+    Task<BehavioralFeatures> SaveBehavioralFeaturesAsync(BehavioralFeatures features);
+    Task<List<BehavioralFeatures>> GetBehavioralFeaturesBySessionAsync(string sessionId);
+    Task<List<BehavioralFeatures>> GetBehavioralFeaturesByStudentAsync(string studentId, DateTime startDate, DateTime endDate);
+    Task<List<BehavioralFeatures>> GetBehavioralFeaturesByClassroomAsync(string classroomId, string timeWindow);
 }
 
 public class CosmosDbService : ICosmosDbService
@@ -216,5 +223,114 @@ public class CosmosDbService : ICosmosDbService
 
         await Task.CompletedTask;
         return true;
+    }
+
+    // New methods for NeuraLens behavioral analytics
+    public async Task<BehavioralFeatures> SaveBehavioralFeaturesAsync(BehavioralFeatures features)
+    {
+        if (!_isConfigured || _database == null)
+        {
+            throw new InvalidOperationException("Cosmos DB not configured");
+        }
+
+        var container = _database.GetContainer("BehavioralFeatures");
+        var response = await container.CreateItemAsync(features, new PartitionKey(features.SessionId));
+        return response.Resource;
+    }
+
+    public async Task<List<BehavioralFeatures>> GetBehavioralFeaturesBySessionAsync(string sessionId)
+    {
+        if (!_isConfigured || _database == null)
+        {
+            return new List<BehavioralFeatures>();
+        }
+
+        try
+        {
+            var container = _database.GetContainer("BehavioralFeatures");
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.sessionId = @sessionId ORDER BY c.timestamp DESC")
+                .WithParameter("@sessionId", sessionId);
+
+            var results = new List<BehavioralFeatures>();
+            var iterator = container.GetItemQueryIterator<BehavioralFeatures>(query);
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                results.AddRange(response);
+            }
+
+            return results;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching behavioral features for session {SessionId}", sessionId);
+            return new List<BehavioralFeatures>();
+        }
+    }
+
+    public async Task<List<BehavioralFeatures>> GetBehavioralFeaturesByStudentAsync(string studentId, DateTime startDate, DateTime endDate)
+    {
+        if (!_isConfigured || _database == null)
+        {
+            return new List<BehavioralFeatures>();
+        }
+
+        try
+        {
+            var container = _database.GetContainer("BehavioralFeatures");
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.studentId = @studentId AND c.timestamp >= @startDate AND c.timestamp <= @endDate ORDER BY c.timestamp DESC")
+                .WithParameter("@studentId", studentId)
+                .WithParameter("@startDate", startDate)
+                .WithParameter("@endDate", endDate);
+
+            var results = new List<BehavioralFeatures>();
+            var iterator = container.GetItemQueryIterator<BehavioralFeatures>(query);
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                results.AddRange(response);
+            }
+
+            return results;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching behavioral features for student {StudentId}", studentId);
+            return new List<BehavioralFeatures>();
+        }
+    }
+
+    public async Task<List<BehavioralFeatures>> GetBehavioralFeaturesByClassroomAsync(string classroomId, string timeWindow)
+    {
+        if (!_isConfigured || _database == null)
+        {
+            return new List<BehavioralFeatures>();
+        }
+
+        try
+        {
+            var container = _database.GetContainer("BehavioralFeatures");
+            // Extract classroom from sessionId (assuming format: classroom-session)
+            var query = new QueryDefinition("SELECT * FROM c WHERE STARTSWITH(c.sessionId, @classroomId) ORDER BY c.timestamp DESC")
+                .WithParameter("@classroomId", classroomId);
+
+            var results = new List<BehavioralFeatures>();
+            var iterator = container.GetItemQueryIterator<BehavioralFeatures>(query);
+
+            while (iterator.HasMoreResults)
+            {
+                var response = await iterator.ReadNextAsync();
+                results.AddRange(response);
+            }
+
+            return results;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching behavioral features for classroom {ClassroomId}", classroomId);
+            return new List<BehavioralFeatures>();
+        }
     }
 }

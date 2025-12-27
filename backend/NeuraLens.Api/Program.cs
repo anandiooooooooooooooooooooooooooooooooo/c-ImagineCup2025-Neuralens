@@ -12,15 +12,17 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "NeuraLens API",
         Version = "v1",
-        Description = "IoT Edge AI Vision Analytics Dashboard API"
+        Description = "Privacy-First ADHD/ASD Early Detection System API"
     });
 });
 
-// Register Azure services
-builder.Services.AddSingleton<IIoTHubService, IoTHubService>();
+// Register NeuraLens services
+builder.Services.AddHttpClient<IComputerVisionService, ComputerVisionService>();
+builder.Services.AddScoped<IBehavioralAnalyticsService, BehavioralAnalyticsService>();
+builder.Services.AddScoped<IRiskScoringEngine, RiskScoringEngine>();
+builder.Services.AddScoped<IExplainableAIService, ExplainableAIService>();
 builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 builder.Services.AddSingleton<ICosmosDbService, CosmosDbService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
