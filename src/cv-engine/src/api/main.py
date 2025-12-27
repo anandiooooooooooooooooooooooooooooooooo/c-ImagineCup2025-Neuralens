@@ -10,12 +10,16 @@ import os
 import uuid
 import aiofiles
 from datetime import datetime
+import sys
 
-from ..preprocessing.anonymizer import FaceAnonymizer
-from ..detection.pose_estimator import PoseEstimator, PoseLandmarks
-from ..features.movement_calculator import MovementCalculator
-from ..features.attention_calculator import AttentionCalculator
-from ..utils.config import settings
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from preprocessing.anonymizer import FaceAnonymizer
+from detection.pose_estimator import PoseEstimator, PoseLandmarks
+from features.movement_calculator import MovementCalculator
+from features.attention_calculator import AttentionCalculator
+from utils.config import settings
 
 # Initialize FastAPI app
 app = FastAPI(
