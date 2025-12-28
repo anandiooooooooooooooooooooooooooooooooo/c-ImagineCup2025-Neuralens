@@ -1,6 +1,6 @@
 # NeuraLens - ADHD/ASD Early Detection System
 
-[![Imagine Cup 2025](https://img.shields.io/badge/Imagine%20Cup-2025-blue)](https://imaginecup.microsoft.com/)
+[![Imagine Cup 2026](https://img.shields.io/badge/Imagine%20Cup-2026-blue)](https://imaginecup.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Powered by AI](https://img.shields.io/badge/AI-Powered-purple)](https://www.openai.com/)
 
@@ -90,6 +90,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  <b>Built for the Microsoft Imagine Cup 2025</b><br>
+  <b>Built for the Microsoft Imagine Cup 2026</b><br>
   <i>Empowering educators with AI-driven insights.</i>
 </div>

@@ -1,5 +1,0 @@
-# NeuraLens Webcam Testing Tool - Dependencies
-
-opencv-python>=4.8.0
-numpy>=1.24.0
-requests>=2.31.0
