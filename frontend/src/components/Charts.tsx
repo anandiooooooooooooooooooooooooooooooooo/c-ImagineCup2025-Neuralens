@@ -22,12 +22,16 @@ import {
 import type { TimeSeriesData, DetectionSummary, RiskScoreTrend, BehavioralIndicator, HeatmapPoint } from '../types';
 import './Charts.css';
 
+import { useApp } from '../i18n/AppContext';
+
 interface DetectionTrendChartProps {
   data: TimeSeriesData[];
   title?: string;
 }
 
 export const DetectionTrendChart: React.FC<DetectionTrendChartProps> = ({ data, title = 'Detection Trend' }) => {
+  const { t } = useApp();
+
   const formattedData = data.map(item => ({
     ...item,
     time: new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -37,7 +41,7 @@ export const DetectionTrendChart: React.FC<DetectionTrendChartProps> = ({ data, 
     <div className="chart-card card">
       <div className="chart-header">
         <h3 className="chart-title">{title}</h3>
-        <span className="chart-subtitle">Last 24 hours</span>
+        <span className="chart-subtitle">{t('last24Hours') || 'Last 24 hours'}</span>
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={280}>
@@ -96,8 +100,9 @@ interface DetectionPieChartProps {
 const COLORS = ['#6366f1', '#22d3ee', '#10b981', '#f59e0b', '#ef4444', '#a855f7', '#ec4899'];
 
 export const DetectionPieChart: React.FC<DetectionPieChartProps> = ({ data, title = 'Detection Types' }) => {
+  const { t } = useApp();
   const pieData = data.map(item => ({
-    name: item.objectType,
+    name: t(item.objectType as any) || item.objectType,
     value: item.count,
     confidence: item.averageConfidence,
   }));
@@ -106,7 +111,7 @@ export const DetectionPieChart: React.FC<DetectionPieChartProps> = ({ data, titl
     <div className="chart-card card">
       <div className="chart-header">
         <h3 className="chart-title">{title}</h3>
-        <span className="chart-subtitle">Distribution by type</span>
+        <span className="chart-subtitle">{t('distributionByType')}</span>
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={280}>
@@ -132,7 +137,7 @@ export const DetectionPieChart: React.FC<DetectionPieChartProps> = ({ data, titl
                 boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
               }}
               labelStyle={{ color: '#f8fafc' }}
-              formatter={(value: number, name: string) => [`${value} detections`, name]}
+              formatter={(value: number | undefined, name: any) => [`${value} detections`, name]}
             />
             <Legend 
               verticalAlign="bottom"
@@ -153,8 +158,9 @@ interface ConfidenceBarChartProps {
 }
 
 export const ConfidenceBarChart: React.FC<ConfidenceBarChartProps> = ({ data, title = 'Detection Confidence' }) => {
+  const { t } = useApp();
   const barData = data.map(item => ({
-    name: item.objectType,
+    name: t(item.objectType as any) || item.objectType,
     count: item.count,
     confidence: item.averageConfidence,
   }));
@@ -163,7 +169,7 @@ export const ConfidenceBarChart: React.FC<ConfidenceBarChartProps> = ({ data, ti
     <div className="chart-card card">
       <div className="chart-header">
         <h3 className="chart-title">{title}</h3>
-        <span className="chart-subtitle">Average confidence by type</span>
+        <span className="chart-subtitle">{t('averageConfidenceByType')}</span>
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={280}>
@@ -194,7 +200,7 @@ export const ConfidenceBarChart: React.FC<ConfidenceBarChartProps> = ({ data, ti
                 boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
               }}
               labelStyle={{ color: '#f8fafc' }}
-              formatter={(value: number) => [`${value.toFixed(1)}%`, 'Confidence']}
+              formatter={(value: number | undefined) => [`${value?.toFixed(1)}%`, 'Confidence']}
             />
             <Bar 
               dataKey="confidence" 
@@ -214,7 +220,9 @@ interface RiskTimelineChartProps {
   title?: string;
 }
 
-export const RiskTimelineChart: React.FC<RiskTimelineChartProps> = ({ data, title = 'Risk Score Timeline' }) => {
+export const RiskTimelineChart: React.FC<RiskTimelineChartProps> = ({ data, title }) => {
+  const { t } = useApp();
+  const chartTitle = title || t('riskScoreTimeline');
   const formattedData = data.map(item => ({
     ...item,
     time: new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -223,8 +231,8 @@ export const RiskTimelineChart: React.FC<RiskTimelineChartProps> = ({ data, titl
   return (
     <div className="chart-card card">
       <div className="chart-header">
-        <h3 className="chart-title">{title}</h3>
-        <span className="chart-subtitle">Early risk detection indicators</span>
+        <h3 className="chart-title">{chartTitle}</h3>
+        <span className="chart-subtitle">{t('earlyRiskIndicators')}</span>
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={280}>
@@ -265,7 +273,7 @@ export const RiskTimelineChart: React.FC<RiskTimelineChartProps> = ({ data, titl
               stroke="#ef4444"
               strokeWidth={2}
               dot={false}
-              name="Attention Risk"
+              name={t('attentionRisk')}
             />
             <Line
               type="monotone"
@@ -273,7 +281,7 @@ export const RiskTimelineChart: React.FC<RiskTimelineChartProps> = ({ data, titl
               stroke="#f59e0b"
               strokeWidth={2}
               dot={false}
-              name="Hyperactivity Risk"
+              name={t('hyperactivityRisk')}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -287,12 +295,14 @@ interface BehavioralBarChartProps {
   title?: string;
 }
 
-export const BehavioralBarChart: React.FC<BehavioralBarChartProps> = ({ data, title = 'Behavioral Indicators' }) => {
+export const BehavioralBarChart: React.FC<BehavioralBarChartProps> = ({ data, title }) => {
+  const { t } = useApp();
+  const chartTitle = title || t('behavioralIndicators');
   return (
     <div className="chart-card card">
       <div className="chart-header">
-        <h3 className="chart-title">{title}</h3>
-        <span className="chart-subtitle">Detected behaviors in classroom</span>
+        <h3 className="chart-title">{chartTitle}</h3>
+        <span className="chart-subtitle">{t('detectedBehaviorsClassroom')}</span>
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={280}>
@@ -324,8 +334,8 @@ export const BehavioralBarChart: React.FC<BehavioralBarChartProps> = ({ data, ti
               labelStyle={{ color: '#f8fafc' }}
               formatter={(value: number | undefined, name: string | undefined) => {
                 if (!value) return ['0', name || ''];
-                if (name === 'count') return [`${value} events`, 'Count'];
-                return [`${value}%`, 'Percentage'];
+                if (name === 'count') return [`${value} ${t('events') || 'events'}`, t('count')];
+                return [`${value}%`, t('percentage')];
               }}
             />
             <Bar 
@@ -345,7 +355,9 @@ interface ActivityHeatmapProps {
   title?: string;
 }
 
-export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title = 'Classroom Activity Heatmap' }) => {
+export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
+  const { t } = useApp();
+  const chartTitle = title || t('classroomActivityHeatmap');
   const getColor = (activity: number) => {
     if (activity < 25) return '#1e40af';
     if (activity < 50) return '#22d3ee';
@@ -356,8 +368,8 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title = 
   return (
     <div className="chart-card card">
       <div className="chart-header">
-        <h3 className="chart-title">{title}</h3>
-        <span className="chart-subtitle">Activity distribution across classroom</span>
+        <h3 className="chart-title">{chartTitle}</h3>
+        <span className="chart-subtitle">{t('activityDistributionClassroom')}</span>
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={280}>
@@ -399,7 +411,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title = 
               labelStyle={{ color: '#f8fafc' }}
               formatter={(value: number | undefined, name: string | undefined) => {
                 if (!value) return ['0', name || ''];
-                if (name === 'activity') return [`${value}%`, 'Activity Level'];
+                if (name === 'activity') return [`${value}%`, t('activityLevel')];
                 return [value || 0, name || ''];
               }}
             />

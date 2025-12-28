@@ -8,7 +8,10 @@ interface DeviceCardProps {
   onClick?: () => void;
 }
 
+import { useApp } from '../i18n/AppContext';
+
 const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
+  const { t } = useApp();
   const isOnline = device.status === 'online';
   const isWebcam = device.deviceType === 'Browser WebRTC';
 
@@ -23,20 +26,20 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
       <div className="device-header">
         <div className="device-info">
           <h4 className="device-name">
-            {device.name}
+            {device.name === 'This Laptop (Local)' ? t('thisLaptopLocal') : device.name}
             {isWebcam && isOnline && (
-              <span className="live-badge">🔴 LIVE</span>
+              <span className="live-badge">🔴 {t('live') || 'LIVE'}</span>
             )}
           </h4>
           <div className="device-location">
             <MapPin size={12} />
-            <span>{device.location}</span>
+            <span>{device.location === 'Local Machine' ? t('localMachine') : device.location}</span>
           </div>
         </div>
         <div className={`status-badge ${device.status}`}>
           <span className={`status-dot ${device.status}`}></span>
           {isOnline ? <Wifi size={14} /> : <WifiOff size={14} />}
-          <span>{device.status}</span>
+          <span>{t(device.status as any) || device.status}</span>
         </div>
       </div>
 
@@ -45,7 +48,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
           <div className="metric-box">
             <div className="metric-header">
               <Cpu size={14} />
-              <span>CPU</span>
+              <span>{t('cpu')}</span>
             </div>
             <div className="metric-value">{device.metrics.cpuUsage.toFixed(1)}%</div>
             <div className="progress-bar">
@@ -59,7 +62,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
           <div className="metric-box">
             <div className="metric-header">
               <HardDrive size={14} />
-              <span>Memory</span>
+              <span>{t('memory')}</span>
             </div>
             <div className="metric-value">{device.metrics.memoryUsage.toFixed(1)}%</div>
             <div className="progress-bar">
@@ -73,7 +76,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
           <div className="metric-box">
             <div className="metric-header">
               <Thermometer size={14} />
-              <span>Temp</span>
+              <span>{t('temp')}</span>
             </div>
             <div className="metric-value">{device.metrics.temperature.toFixed(1)}°C</div>
           </div>
@@ -81,7 +84,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
           <div className="metric-box">
             <div className="metric-header">
               <Timer size={14} />
-              <span>Latency</span>
+              <span>{t('latency')}</span>
             </div>
             <div className="metric-value">{device.metrics.inferenceLatency.toFixed(1)}ms</div>
           </div>
@@ -89,7 +92,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
           <div className="metric-box">
             <div className="metric-header">
               <Target size={14} />
-              <span>Accuracy</span>
+              <span>{t('accuracy')}</span>
             </div>
             <div className="metric-value accuracy">{device.metrics.accuracy.toFixed(1)}%</div>
           </div>
@@ -97,7 +100,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
           <div className="metric-box">
             <div className="metric-header">
               <span>📹</span>
-              <span>Frames</span>
+              <span>{t('frames')}</span>
             </div>
             <div className="metric-value">{device.metrics.framesProcessed.toLocaleString()}</div>
           </div>
@@ -107,8 +110,8 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
       {!isOnline && (
         <div className="device-offline-message">
           <WifiOff size={24} />
-          <span>Device is currently offline</span>
-          <span className="last-seen">Last seen: {new Date(device.lastSeen).toLocaleString()}</span>
+          <span>{t('deviceCurrentlyOffline')}</span>
+          <span className="last-seen">{t('lastSeen')}: {new Date(device.lastSeen).toLocaleString()}</span>
         </div>
       )}
     </div>

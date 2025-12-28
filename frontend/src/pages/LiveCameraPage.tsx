@@ -2,20 +2,14 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Camera, StopCircle, PlayCircle, AlertCircle, Video, Activity } from 'lucide-react';
 import './LiveCameraPage.css';
 
-interface Detection {
-  id: string;
-  objectType: string;
-  confidence: number;
-  timestamp: string;
-  boundingBox?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
-}
+import type { DetectionResult, Alert } from '../types';
+
+interface Detection extends DetectionResult {}
+
+import { useApp } from '../i18n/AppContext';
 
 const LiveCameraPage: React.FC = () => {
+  const { t } = useApp();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -30,6 +24,17 @@ const LiveCameraPage: React.FC = () => {
   const detectionIntervalRef = useRef<any>(null);
 
   useEffect(() => {
+    // Load stored detections on mount
+    const storedDetectionsStr = localStorage.getItem('localDetections');
+    if (storedDetectionsStr) {
+      const stored = JSON.parse(storedDetectionsStr);
+      setDetections(stored.slice(0, 10)); // Show last 10
+      setStats(prev => ({
+        ...prev,
+        totalDetections: stored.length
+      }));
+    }
+
     return () => {
       stopCamera();
     };
@@ -174,6 +179,7 @@ const LiveCameraPage: React.FC = () => {
 
       const newDetection: Detection = {
         id: `det-${Date.now()}`,
+        deviceId: 'webcam-local-001',
         objectType: detectionTypes[Math.floor(Math.random() * detectionTypes.length)],
         confidence: 75 + Math.random() * 20, // 75-95%
         timestamp: new Date().toISOString(),
@@ -182,7 +188,8 @@ const LiveCameraPage: React.FC = () => {
           y: 100 + Math.random() * 100,
           width: 200,
           height: 250
-        }
+        },
+        imageUrl: '/placeholder-detection.jpg' // Placeholder as we don't store real images yet
       };
 
       setDetections(prev => [newDetection, ...prev.slice(0, 9)]); // Keep last 10
@@ -191,6 +198,31 @@ const LiveCameraPage: React.FC = () => {
         totalDetections: prev.totalDetections + 1,
         currentFaces: Math.floor(Math.random() * 2) + 1 // 1-2 faces
       }));
+
+      // SAVE TO LOCAL STORAGE for Detections Page
+      const storedDetections = JSON.parse(localStorage.getItem('localDetections') || '[]');
+      const updatedStoredDetections = [newDetection, ...storedDetections].slice(0, 50); // Keep last 50 globally
+      localStorage.setItem('localDetections', JSON.stringify(updatedStoredDetections));
+
+      // SIMULATE ALERTS based on detection
+      // 30% chance to generate an alert for demo purposes
+      if (Math.random() > 0.7) {
+        const severity = newDetection.confidence < 80 ? 'warning' : 'info';
+        const newAlert: Alert = {
+          id: `alert-${Date.now()}`,
+          deviceId: 'webcam-local-001',
+          severity: severity,
+          title: `Detected ${newDetection.objectType}`,
+          message: `Local camera detected ${newDetection.objectType} with ${newDetection.confidence.toFixed(1)}% confidence`,
+          timestamp: new Date().toISOString(),
+          isRead: false,
+          isResolved: false
+        };
+
+        const storedAlerts = JSON.parse(localStorage.getItem('localAlerts') || '[]');
+        const updatedStoredAlerts = [newAlert, ...storedAlerts].slice(0, 20); // Keep last 20
+        localStorage.setItem('localAlerts', JSON.stringify(updatedStoredAlerts));
+      }
 
       // Draw detection on canvas
       drawDetection(newDetection);
@@ -267,20 +299,20 @@ const LiveCameraPage: React.FC = () => {
         <div className="header-content">
           <h1>
             <Video size={28} style={{ display: 'inline', marginRight: '12px' }} />
-            Live Camera Feed
+            {t('liveCameraFeed')}
           </h1>
-          <p className="header-subtitle">Real-time ADHD/ASD behavior detection</p>
+          <p className="header-subtitle">{t('realtimeBehaviorDetection')}</p>
         </div>
         <div className="header-actions">
           {!isStreaming ? (
-            <button className="btn btn-primary" onClick={startCamera}>
-              <PlayCircle size={16} />
-              Start Camera
-            </button>
+              <button className="btn btn-primary" onClick={startCamera}>
+                <PlayCircle size={16} />
+                {t('startCamera')}
+              </button>
           ) : (
             <button className="btn btn-secondary" onClick={stopCamera}>
               <StopCircle size={16} />
-              Stop Camera
+              {t('stopCamera')}
             </button>
           )}
         </div>
@@ -311,7 +343,7 @@ const LiveCameraPage: React.FC = () => {
             {!isStreaming && (
               <div className="video-placeholder">
                 <Camera size={64} />
-                <p>Click "Start Camera" to begin live detection</p>
+                <p>{t('clickStartCamera')}</p>
               </div>
             )}
 
@@ -336,16 +368,16 @@ const LiveCameraPage: React.FC = () => {
 
         <div className="detection-panel">
           <div className="panel-header">
-            <h3>Recent Detections</h3>
-            <span className="badge">{stats.totalDetections} total</span>
+            <h3>{t('recentDetections')}</h3>
+            <span className="badge">{stats.totalDetections} {t('total')}</span>
           </div>
 
           <div className="detections-list">
             {detections.length === 0 ? (
               <div className="empty-detections">
                 <AlertCircle size={32} />
-                <p>No detections yet</p>
-                <span>Detections will appear here in real-time</span>
+                <p>{t('noDetectionsYet')}</p>
+                <span>{t('detectionsWillAppear')}</span>
               </div>
             ) : (
               detections.map((detection, index) => (
@@ -355,7 +387,7 @@ const LiveCameraPage: React.FC = () => {
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <div className="detection-header">
-                    <span className="detection-type">{detection.objectType}</span>
+                    <span className="detection-type">{t(detection.objectType as any) || detection.objectType}</span>
                     <span className={`confidence ${detection.confidence >= 90 ? 'high' : detection.confidence >= 80 ? 'medium' : 'low'}`}>
                       {detection.confidence.toFixed(1)}%
                     </span>
@@ -376,8 +408,8 @@ const LiveCameraPage: React.FC = () => {
             <Camera size={24} />
           </div>
           <div className="info-content">
-            <h4>Camera Access</h4>
-            <p>Using browser WebRTC API to access your webcam directly. No data is stored or transmitted.</p>
+            <h4>{t('cameraAccess')}</h4>
+            <p>{t('cameraAccessDesc')}</p>
           </div>
         </div>
         <div className="info-card">
@@ -385,8 +417,8 @@ const LiveCameraPage: React.FC = () => {
             <Activity size={24} />
           </div>
           <div className="info-content">
-            <h4>Real-time Detection</h4>
-            <p>AI model analyzes video frames every 2 seconds for ADHD/ASD behavioral indicators.</p>
+            <h4>{t('realtimeDetection')}</h4>
+            <p>{t('realtimeDetectionDesc')}</p>
           </div>
         </div>
         <div className="info-card">
@@ -394,8 +426,8 @@ const LiveCameraPage: React.FC = () => {
             <AlertCircle size={24} />
           </div>
           <div className="info-content">
-            <h4>Privacy Notice</h4>
-            <p>All processing happens locally in your browser. Video feed is not recorded or uploaded.</p>
+            <h4>{t('privacyNotice')}</h4>
+            <p>{t('privacyNoticeDesc')}</p>
           </div>
         </div>
       </div>

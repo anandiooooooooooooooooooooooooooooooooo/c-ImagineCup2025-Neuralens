@@ -20,7 +20,15 @@ function App() {
         setAlertCount(result.count);
       } catch {
         // Use mock count
-        setAlertCount(2);
+        // Use local storage count
+        const localAlertsStr = localStorage.getItem('localAlerts');
+        if (localAlertsStr) {
+          const alerts = JSON.parse(localAlertsStr);
+          const unreadCount = alerts.filter((a: any) => !a.isRead).length;
+          setAlertCount(unreadCount);
+        } else {
+          setAlertCount(0);
+        }
       }
     };
 

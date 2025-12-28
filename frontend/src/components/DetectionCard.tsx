@@ -9,7 +9,10 @@ interface DetectionCardProps {
   onClick?: () => void;
 }
 
+import { useApp } from '../i18n/AppContext';
+
 const DetectionCard: React.FC<DetectionCardProps> = ({ detection, onClick }) => {
+  const { t } = useApp();
   const timeAgo = formatDistanceToNow(new Date(detection.timestamp), { addSuffix: true });
 
   const getObjectIcon = (type: string) => {
@@ -53,7 +56,7 @@ const DetectionCard: React.FC<DetectionCardProps> = ({ detection, onClick }) => 
       <div className="detection-content">
         <div className="detection-type">
           <span className="type-icon">{getObjectIcon(detection.objectType)}</span>
-          <span className="type-name">{detection.objectType}</span>
+          <span className="type-name">{t(detection.objectType as any) || detection.objectType}</span>
         </div>
 
         <div className="detection-meta">

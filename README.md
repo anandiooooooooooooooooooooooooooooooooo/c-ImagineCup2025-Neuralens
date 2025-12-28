@@ -1,645 +1,95 @@
-<<<<<<< HEAD
 # NeuraLens - ADHD/ASD Early Detection System
 
-[![Microsoft Imagine Cup 2025](https://img.shields.io/badge/Imagine%20Cup-2025-blue)](https://imaginecup.microsoft.com/)
-[![Azure](https://img.shields.io/badge/Azure-Powered-0078D4)](https://azure.microsoft.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+[![Imagine Cup 2025](https://img.shields.io/badge/Imagine%20Cup-2025-blue)](https://imaginecup.microsoft.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Powered by AI](https://img.shields.io/badge/AI-Powered-purple)](https://www.openai.com/)
 
 > **AI-Powered Behavioral Monitoring for Early Detection of ADHD/ASD Risk Indicators in Classroom Environments**
 
 ## 🎯 Project Overview
 
-NeuraLens is a **non-diagnostic** behavioral monitoring system that helps educators identify students who may benefit from professional assessment for ADHD or ASD. Using computer vision and AI, we analyze classroom behavior patterns to detect risk indicators, empowering teachers and school psychologists with actionable insights.
+NeuraLens is a behavioral monitoring system designed to help educators identify students who may benefit from professional assessment for ADHD or ASD. Using advanced computer vision and AI, we analyze classroom behavior patterns to detect risk indicators, empowering teachers and school psychologists with actionable comparisons and insights.
 
-**⚠️ CRITICAL: This system does NOT diagnose medical conditions.** All outputs are framed as "behavioral observations" or "risk indicators" that require professional follow-up.
+**⚠️ NOTE:** This system is **non-diagnostic**. It provides behavioral observations and risk indicators to support professional decision-making.
 
 ---
 
 ## 🌟 Key Features
 
-### 🎥 Privacy-First Computer Vision
-- **Face Anonymization**: All faces are blurred/silhouetted before processing
-- **Anonymous Student IDs**: No personally identifiable information stored
-- **Secure Processing**: Video data deleted after analysis (30-day max retention)
-
 ### 📊 Behavioral Analytics
-- **Movement Intensity Index (MII)**: Tracks fidgeting, position changes, excessive movement
-- **Attention Duration Ratio (ADR)**: Measures sustained focus and on-task behavior
-- **Baseline Comparison**: Individual behavior compared to classroom norms
-- **Real-Time Monitoring**: Immediate feedback during class sessions
+- **Movement Intensity Index (MII)**: Tracks fidgeting, frequent position changes, and hyperactivity.
+- **Attention Duration Ratio (ADR)**: Measures sustained focus, head orientation, and on-task behavior.
+- **Baseline Comparison**: Compares individual student behavior against class averages.
 
-### 🧠 Explainable AI
-- **Plain-Language Explanations**: No technical jargon for educators
-- **Actionable Recommendations**: Specific observation strategies for teachers
-- **Pattern Recognition**: Identifies consistent behavioral indicators over time
-- **Azure AI Agent Service**: Contextualizes findings with educational insights
+### 🎥 Privacy-First Monitoring
+- **Real-Time Detection**: Processes video feeds instantly to provide live feedback.
+- **Face Anonymization**: Ensures student privacy by processing data securely.
 
 ### 📈 Interactive Dashboard
-- **Risk Timeline Visualization**: Track behavioral patterns over days/weeks
-- **Classroom Activity Heatmap**: Spatial distribution of student activity
-- **Individual Risk Cards**: Anonymized student profiles with key indicators
-- **Exportable Reports**: Generate summaries for parent-teacher conferences
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  Frontend Dashboard (React/Blazor)                      │
-│  - Real-time behavioral monitoring                      │
-│  - Risk indicator visualizations                        │
-│  - Classroom heatmaps & timelines                       │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│  Backend API (.NET Aspire / C#)                         │
-│  - Video ingestion & orchestration                      │
-│  - Behavioral feature aggregation                       │
-│  - Risk scoring engine (rule-based + ML)                │
-│  - Explainable AI integration                           │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│  Computer Vision Engine (Python/FastAPI)                │
-│  - YOLO v8/v9: Multi-student detection & tracking       │
-│  - MediaPipe: Pose estimation & head orientation        │
-│  - Movement Intensity Calculator                        │
-│  - Attention Duration Calculator                        │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌──────────────────┬──────────────────┬──────────────────┐
-│ Azure Cosmos DB  │ Azure Blob       │ Azure AI Agent   │
-│ - Behavioral     │ Storage          │ Service          │
-│   baselines      │ - Anonymized     │ - Pattern        │
-│ - Risk scores    │   frames         │   analysis       │
-│ - Time-series    │ - Processing     │ - Explanations   │
-│   metrics        │   artifacts      │                  │
-└──────────────────┴──────────────────┴──────────────────┘
-```
-
----
-=======
-# NeuraLens - IoT Edge AI Vision Analytics Dashboard
-
-A modern, real-time dashboard for monitoring and managing Azure IoT Edge devices with AI-powered computer vision capabilities.
-
-## 🏗️ Architecture
-
-This project implements the following Azure services architecture:
-
-```
-Camera → Edge Device (Azure IoT Edge) → Azure IoT Hub → Azure Functions → Azure SQL/Cosmos DB → Dashboard
-         ├── MediaPipe
-         └── PyTorch/ONNX Runtime
-```
-
-## 📁 Project Structure
-
-```
-NeuraLens/
-├── backend/                    # C# .NET 8 Web API
-│   └── NeuraLens.Api/
-│       ├── Controllers/        # API endpoints
-│       ├── Models/             # Data models
-│       ├── Services/           # Azure service integrations
-│       └── Program.cs          # Application entry point
-│
-└── frontend/                   # React TypeScript
-    └── src/
-        ├── components/         # Reusable UI components
-        ├── pages/              # Page components
-        ├── services/           # API client
-        └── types/              # TypeScript interfaces
-```
->>>>>>> 8ff1e7785b1acb63bb2dea84abbb617e1974171c
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-<<<<<<< HEAD
-- **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **Node.js 22+** - [Download](https://nodejs.org/)
-- **Python 3.11+** - [Download](https://www.python.org/downloads/)
-- **Docker Desktop** - [Download](https://www.docker.com/products/docker-desktop/)
-- **Azure CLI** - [Install](https://aka.ms/install-azcli)
-- **Azure Developer CLI (azd)** - [Install](https://aka.ms/install-azd)
-
-### Local Development Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/anandiooooooooooooooooooooooooooooooooo/neuralens-imaginecup-2025.git
-   cd neuralens-imaginecup-2025
-   ```
-
-2. **Configure Azure Resources**
-   
-   Create `appsettings.Development.json` in `src/NeuraLens.AppHost/`:
-   ```json
-   {
-     "Azure": {
-       "SubscriptionId": "<Your Azure Subscription ID>",
-       "ResourceGroup": "neuralens-rg",
-       "Location": "swedencentral",
-       "CredentialSource": "InteractiveBrowser"
-     },
-     "ConnectionStrings": {
-       "openAI": "https://<your-resource>.openai.azure.com/",
-       "cosmosDb": "https://<your-resource>.documents.azure.com:443/",
-       "blobStorage": "https://<your-resource>.blob.core.windows.net/"
-=======
-- .NET 8 SDK
-- Node.js 18+ and npm
-- Azure subscription (optional, demo mode available)
-
-### Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend/NeuraLens.Api
-   ```
-
-2. Update `appsettings.json` with your Azure credentials (optional):
-   ```json
-   {
-     "Azure": {
-       "IoTHub": {
-         "ConnectionString": "YOUR_IOT_HUB_CONNECTION_STRING"
-       },
-       "BlobStorage": {
-         "ConnectionString": "YOUR_BLOB_STORAGE_CONNECTION_STRING"
-       },
-       "CosmosDb": {
-         "ConnectionString": "YOUR_COSMOS_DB_CONNECTION_STRING"
-       }
->>>>>>> 8ff1e7785b1acb63bb2dea84abbb617e1974171c
-     }
-   }
-   ```
-
-<<<<<<< HEAD
-3. **Install Python Dependencies (CV Engine)**
-   ```bash
-   cd src/cv-engine
-   pip install -r requirements.txt
-   ```
-
-4. **Run the Application**
-   
-   **Option A: Visual Studio 2022**
-   - Open `src/NeuraLens.sln`
-   - Set `NeuraLens.AppHost` as startup project
-   - Press F5
-
-   **Option B: .NET CLI**
-   ```bash
-   cd src/NeuraLens.AppHost
-   dotnet run
-   ```
-
-5. **Access the Dashboard**
-   - Frontend: `https://localhost:5001`
-   - Backend API: `https://localhost:7001`
-   - CV Engine: `http://localhost:8000`
-
----
-
-## 📊 Behavioral Indicators Explained
-
-### Movement Intensity Index (MII)
-**What we detect:**
-- Frequent position changes (shifting in seat)
-- Standing up without permission
-- Fidgeting behaviors
-- Excessive body movement vs. peers
-
-**Technical approach:**
-- MediaPipe Pose tracks 33 skeletal keypoints
-- Frame-to-frame displacement calculation
-- Aggregation over time windows (30s, 2min, 5min)
-- Comparison to classroom baseline (median movement)
-
-**Output example:**
-```json
-{
-  "movement_intensity_score": 0.82,
-  "threshold": 0.70,
-  "status": "elevated",
-  "baseline_deviation": +0.35,
-  "event_count": 12,
-  "time_window": "5min"
-}
-```
-
-### Attention Duration Ratio (ADR)
-**What we detect:**
-- Head frequently not facing board/teacher
-- Short duration of sustained focus
-- Looking around classroom excessively
-- Off-task visual behavior
-
-**Technical approach:**
-- MediaPipe Face Mesh estimates head pose (pitch, yaw, roll)
-- "On-task zone" defined as ±30° yaw from forward-facing
-- Percentage calculation: on-task time vs. off-task time
-- Longest continuous attention span tracking
-
-**Output example:**
-```json
-{
-  "attention_ratio": 0.45,
-  "threshold": 0.60,
-  "status": "below_threshold",
-  "baseline_deviation": -0.22,
-  "longest_focus_duration": "45s",
-  "average_focus_duration": "18s"
-}
-```
-
----
-
-## 🔒 Privacy & Ethics
-
-### Data Protection Measures
-✅ **Face blurring** (Gaussian blur, 50px kernel) before any processing  
-✅ **Anonymous student IDs** (UUID, no PII linkage)  
-✅ **Metadata stripping** (location, school name, etc.)  
-✅ **Raw video deletion** after processing (or encrypted, 30-day max)  
-✅ **No video footage** accessible via dashboard  
-
-### Compliance Standards
-- **FERPA** (Family Educational Rights and Privacy Act)
-- **GDPR** (General Data Protection Regulation, if applicable)
-- **Data Retention**: Maximum 90 days
-- **Right to Deletion**: Implemented via API
-- **Parental Consent**: Workflow documented (out of scope for MVP)
-
-### Ethical Boundaries
-⚠️ **NO DIAGNOSTIC LANGUAGE** in UI or outputs  
-⚠️ **ALWAYS** frame as "behavioral observations" or "risk indicators"  
-⚠️ **REQUIRE** professional follow-up for any concerns  
-⚠️ **TRANSPARENT** about system limitations  
+- **Live Class Monitor**: Watch behavioral metrics in real-time.
+- **Risk Analysis**: Visual timelines and scores for different behavioral metrics.
+- **Student Insights**: Detailed breakdown of detected behaviors.
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Backend
-- **.NET 9** with Aspire orchestration
-- **C# 12** for backend services
-- **Azure OpenAI GPT-4o** for explainable AI
-- **Azure Cosmos DB** for time-series behavioral data
-- **Azure Blob Storage** for anonymized frames
-- **Azure Container Apps** for deployment
-
-### Computer Vision Engine
-- **Python 3.11+** with FastAPI
-- **YOLO v8/v9** for student detection & tracking
-- **MediaPipe** for pose estimation & face mesh
-- **OpenCV** for video preprocessing
-- **NumPy/Pandas** for feature calculation
-
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for build tooling
-- **Chart.js** for data visualization
-- **TailwindCSS** (optional) for styling
-- **WebRTC** for live camera streaming (future)
-
-### Azure Services
-- **Azure AI Agent Service** - Behavioral reasoning & explanations
-- **Azure OpenAI** - GPT-4o for natural language generation
-- **Azure Cosmos DB** - NoSQL database for behavioral metrics
-- **Azure Blob Storage** - Anonymized video frame storage
-- **Azure Container Apps** - Microservices deployment
-- **Azure Log Analytics** - System telemetry & monitoring
+- **Frontend**: React (Vite), TypeScript, CSS Modules
+- **Backend / AI Engine**: Python, Flask, MediaPipe (Pose/Face Mesh), YOLOv8 (Object Detection)
+- **Database**: SQL / Key-Value Store (Configurable)
+- **Infrastructure**: Azure / Local Deployment
 
 ---
 
-## 📁 Project Structure
-
-```
-neuralens-imaginecup-2025/
-├── src/
-│   ├── NeuraLens.AppHost/          # .NET Aspire orchestration
-│   ├── NeuraLens.WebApi/           # Backend API (C#)
-│   │   ├── Controllers/
-│   │   │   ├── BehavioralAnalyticsController.cs
-│   │   │   ├── VideoController.cs
-│   │   │   └── DashboardController.cs
-│   │   ├── Services/
-│   │   │   ├── BehavioralAnalyticsService.cs
-│   │   │   ├── RiskScoringEngine.cs
-│   │   │   ├── ExplainableAIService.cs
-│   │   │   └── ComputerVisionService.cs
-│   │   └── Models/
-│   │       ├── BehavioralFeatures.cs
-│   │       ├── RiskAssessment.cs
-│   │       └── ClassroomBaseline.cs
-│   ├── NeuraLens.React/            # Frontend dashboard
-│   │   ├── src/
-│   │   │   ├── components/
-│   │   │   │   ├── BehavioralDashboard.tsx
-│   │   │   │   ├── RiskTimeline.tsx
-│   │   │   │   ├── ClassroomHeatmap.tsx
-│   │   │   │   ├── StudentRiskCard.tsx
-│   │   │   │   └── VideoUploader.tsx
-│   │   │   └── services/
-│   │   │       └── apiClient.ts
-│   ├── cv-engine/                  # Python CV microservice
-│   │   ├── src/
-│   │   │   ├── preprocessing/
-│   │   │   │   ├── video_loader.py
-│   │   │   │   ├── frame_sampler.py
-│   │   │   │   └── anonymizer.py
-│   │   │   ├── detection/
-│   │   │   │   ├── yolo_detector.py
-│   │   │   │   └── pose_estimator.py
-│   │   │   ├── features/
-│   │   │   │   ├── movement_calculator.py
-│   │   │   │   └── attention_calculator.py
-│   │   │   └── api/
-│   │   │       └── main.py
-│   │   ├── models/
-│   │   │   └── yolov9-c.pt
-│   │   ├── Dockerfile
-│   │   └── requirements.txt
-│   └── NeuraLens.ServiceDefaults/  # Shared service configurations
-├── infra/                          # Azure Bicep templates
-├── .github/workflows/              # CI/CD pipelines
-├── README.md
-└── LICENSE.md
-```
-
----
-
-## 🧪 Testing & Validation
-
-### Sample Data Requirements
-- 5+ classroom videos (15-30 min each)
-- Multiple students visible per video
-- Various activities: lecture, group work, independent study
-- Different age groups: elementary, middle school
-
-### Validation Metrics
-- **Detection Accuracy**: IoU > 0.7 for pose estimation
-- **Baseline Stability**: Converges after 5 min observation
-- **Processing Latency**: < 2 seconds per frame
-- **Privacy Compliance**: 100% face anonymization (manual audit)
-
-### Edge Cases Handled
-✅ Student occlusion (blocking each other)  
-✅ Poor lighting conditions  
-✅ Camera angle variations  
-✅ Different classroom sizes  
-
----
-
-## 🚢 Azure Deployment
+## 🚀 Getting Started
 
 ### Prerequisites
-- Azure subscription with sufficient credits
-- Docker Desktop running
-- Azure CLI and azd authenticated
+- **Node.js**: v18+
+- **Python**: v3.9+
 
-### Deployment Steps
+### 1. Backend Setup (AI Engine)
+Navigate to the backend directory and start the Python server:
 
-1. **Login to Azure**
-   ```bash
-   azd auth login
-   az login --use-device-code
-   ```
+```bash
+cd backend
+# Create virtual environment (optional but recommended)
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Mac/Linux:
+source venv/bin/activate
 
-2. **Deploy Infrastructure & Code**
-   ```bash
-   azd up
-   ```
-   
-   **Recommended Region**: `swedencentral` (for Azure AI Agent Service availability)
+# Install dependencies
+pip install -r requirements.txt
 
-3. **Load Sample Data** (Optional)
-   ```bash
-   cd src/data
-   # Run data loading notebook
-   ```
+# Run the server
+python app.py
+```
 
-4. **Access Deployed App**
-   - Dashboard URL will be displayed after deployment
-   - API endpoint: `https://<app-name>.azurecontainerapps.io`
+### 2. Frontend Setup (Dashboard)
+Open a new terminal and navigate to the frontend directory:
 
----
+```bash
+cd frontend
 
-## 📖 Usage Guide
+# Install dependencies
+npm install
 
-### For Teachers
+# Start the development server
+npm run dev
+```
 
-1. **Upload Classroom Video**
-   - Navigate to "Upload Video" page
-   - Select video file (MP4, AVI, MOV)
-   - Enter session details (class name, date, activity type)
-   - Click "Process Video"
-
-2. **View Real-Time Dashboard**
-   - Monitor student behavioral indicators live
-   - Check risk timeline for patterns over time
-   - Review classroom activity heatmap
-
-3. **Generate Reports**
-   - Select student(s) from anonymized list
-   - Choose date range
-   - Export PDF report for parent-teacher conferences
-
-### For School Psychologists
-
-1. **Analyze Behavioral Patterns**
-   - Review risk indicator trends over weeks/months
-   - Compare individual students to classroom baselines
-   - Read AI-generated explanations for context
-
-2. **Identify Students for Assessment**
-   - Filter students by risk level (HIGH, MEDIUM, LOW)
-   - Review specific behavioral indicators (MII, ADR)
-   - Access actionable observation recommendations
-
-3. **Professional Referral**
-   - Use system outputs as **preliminary observations only**
-   - Conduct in-person assessments
-   - Refer to licensed clinicians for diagnosis
-
----
-
-## 🎓 Research Foundation
-
-This system is grounded in established behavioral science research:
-
-- **ADHD Behavioral Markers**: Excessive movement, short attention spans, impulsivity
-- **ASD Behavioral Markers**: Repetitive movements, atypical social engagement, restricted focus
-- **Classroom Observation Protocols**: Standardized methods adapted for AI analysis
-
-**Key References:**
-- "Automated ADHD Detection Using Video-Based Features" (Various studies)
-- "Behavioral Patterns in ASD: Movement and Attention Analysis"
-- "Privacy-Preserving Computer Vision in Educational Settings"
-
----
-
-## 🏆 Microsoft Imagine Cup 2025
-
-### Why NeuraLens Stands Out
-
-1. **Privacy-First Design**: Face anonymization before any processing
-2. **Explainable AI**: Not just risk scores, but WHY and WHAT TO DO
-3. **Non-Diagnostic**: Clear ethical boundaries, empowers educators
-4. **Real-Time**: Immediate feedback, not retrospective analysis
-5. **Scalable**: Cloud-native Azure architecture
-6. **Evidence-Based**: Indicators grounded in behavioral science
-
-### Social Impact
-
-- **Early Intervention**: Identify at-risk students before academic struggles escalate
-- **Equitable Access**: Bring behavioral screening to under-resourced schools
-- **Teacher Empowerment**: Provide educators with data-driven insights
-- **Reduce Stigma**: Objective, non-judgmental behavioral observations
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+The application should now be accessible at `http://localhost:5173` (or the port shown in your terminal).
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see [LICENSE.md](LICENSE.md) for details.
-
----
-
-## 🔗 Resources
-
-- [Azure AI Agent Service Documentation](https://learn.microsoft.com/en-us/azure/ai-studio/)
-- [.NET Aspire Documentation](https://learn.microsoft.com/en-us/dotnet/aspire/)
-- [Semantic Kernel Documentation](https://learn.microsoft.com/en-us/semantic-kernel/)
-- [MediaPipe Documentation](https://google.github.io/mediapipe/)
-- [Ultralytics YOLO Documentation](https://docs.ultralytics.com/)
-
----
-
-## 📧 Contact
-
-**Project Team**: NeuraLens Development Team  
-**Imagine Cup 2025 Submission**  
-
-For questions or support, please open an issue on GitHub.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
-
-**Built with ❤️ for educators and students worldwide**
-
-*Empowering early detection, one classroom at a time.*
-
+  <b>Built for the Microsoft Imagine Cup 2025</b><br>
+  <i>Empowering educators with AI-driven insights.</i>
 </div>
-=======
-3. Run the API:
-   ```bash
-   dotnet run
-   ```
-
-   The API will be available at `http://localhost:5000`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create `.env` file (optional):
-   ```
-   VITE_API_URL=http://localhost:5000/api
-   ```
-
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-   The dashboard will be available at `http://localhost:5173`
-
-## 🔌 Azure Services Integration
-
-### Azure IoT Hub
-- Device twin management
-- Cloud-to-device messaging
-- Telemetry ingestion
-
-### Azure Blob Storage
-- Detection image storage
-- Feature vector storage
-- ML model artifacts
-
-### Azure Cosmos DB
-- Telemetry data storage
-- Detection results
-- Alert management
-
-### Azure Functions (Future)
-- Event-driven processing
-- Alert triggers
-- Report generation
-
-## 📊 Features
-
-- **Real-time Dashboard**: Live metrics and statistics
-- **Device Management**: Monitor and control IoT Edge devices
-- **AI Detection Viewer**: Browse detected objects with confidence scores
-- **Alert System**: Severity-based alerts with resolution workflow
-- **Responsive Design**: Works on desktop and mobile
-
-## 🎨 Tech Stack
-
-### Backend
-- C# .NET 8
-- ASP.NET Core Web API
-- Azure SDK for .NET
-- Swagger/OpenAPI
-
-### Frontend
-- React 18 with TypeScript
-- Vite build tool
-- Recharts for data visualization
-- Lucide React icons
-- Date-fns for date formatting
-- Axios for API calls
-
-## 📝 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/dashboard/stats` | Get dashboard statistics |
-| GET | `/api/devices` | List all devices |
-| GET | `/api/devices/{id}` | Get device details |
-| POST | `/api/devices/{id}/command` | Send command to device |
-| GET | `/api/detections` | List detections |
-| GET | `/api/alerts` | List alerts |
-| PATCH | `/api/alerts/{id}/read` | Mark alert as read |
-
-## 🔐 Security
-
-- CORS configured for frontend origins
-- Azure AD authentication (coming soon)
-- HTTPS enforcement in production
-
-## 📄 License
-
-MIT License
->>>>>>> 8ff1e7785b1acb63bb2dea84abbb617e1974171c

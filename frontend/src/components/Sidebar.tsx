@@ -10,6 +10,7 @@ import {
   Eye,
   Video
 } from 'lucide-react';
+import { useApp } from '../i18n/AppContext';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -19,12 +20,14 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, alertCount }) => {
+  const { t } = useApp();
+  
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'devices', label: 'Devices', icon: Monitor },
-    { id: 'detections', label: 'Detections', icon: ScanSearch },
-    { id: 'camera', label: 'Live Camera', icon: Video },
-    { id: 'alerts', label: 'Alerts', icon: Bell, badge: alertCount },
+    { id: 'dashboard', label: t('dashboard'), icon: LayoutDashboard },
+    { id: 'devices', label: t('devices'), icon: Monitor },
+    { id: 'detections', label: t('detections'), icon: ScanSearch },
+    { id: 'camera', label: t('liveCamera'), icon: Video },
+    { id: 'alerts', label: t('alerts'), icon: Bell, badge: alertCount },
   ];
 
   return (
@@ -43,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, alertCount })
 
       <nav className="sidebar-nav">
         <div className="nav-section">
-          <span className="nav-section-title">Main Menu</span>
+          <span className="nav-section-title">{t('mainMenu')}</span>
           <ul className="nav-list">
             {menuItems.map((item) => (
               <li key={item.id}>
@@ -63,12 +66,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, alertCount })
         </div>
 
         <div className="nav-section">
-          <span className="nav-section-title">System</span>
+          <span className="nav-section-title">{t('systemMenu')}</span>
           <ul className="nav-list">
             <li>
               <button className="nav-item" onClick={() => onTabChange('settings')}>
                 <Settings size={20} />
-                <span>Settings</span>
+                <span>{t('settings')}</span>
               </button>
             </li>
           </ul>
@@ -79,12 +82,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, alertCount })
         <div className="system-status">
           <div className="status-row">
             <Cpu size={16} />
-            <span>System Status</span>
+            <span>{t('systemStatus')}</span>
             <span className="status-indicator online"></span>
           </div>
           <div className="status-row">
             <Activity size={16} />
-            <span>API Health</span>
+            <span>{t('apiHealth')}</span>
             <span className="status-indicator online"></span>
           </div>
         </div>

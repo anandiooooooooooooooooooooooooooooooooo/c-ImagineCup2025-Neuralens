@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, CheckCheck, Bell, AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import AlertCard from '../components/AlertCard';
+import { DetectionPieChart } from '../components/Charts';
 import { alertsApi } from '../services/api';
 import type { Alert } from '../types';
 import './AlertsPage.css';
 
+import { useApp } from '../i18n/AppContext';
+
 const AlertsPage: React.FC = () => {
+  const { t } = useApp();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
   const [severityFilter, setSeverityFilter] = useState<string>('all');
@@ -14,11 +18,31 @@ const AlertsPage: React.FC = () => {
   const fetchAlerts = async () => {
     setLoading(true);
     try {
-      const data = await alertsApi.getAll();
-      setAlerts(data);
+      const apiAlerts = await alertsApi.getAll();
+      
+      // Fetch local alerts
+      const localAlertsStr = localStorage.getItem('localAlerts');
+      let localAlerts: Alert[] = localAlertsStr ? JSON.parse(localAlertsStr) : [];
+      
+      // Filter out legacy dummy data (User Request: "masih dummy")
+      localAlerts = localAlerts.filter(a => !a.id.startsWith('mock-'));
+
+      // Merge: Local first
+      let allAlerts = [...localAlerts, ...apiAlerts];
+
+
+      
+      setAlerts(allAlerts);
     } catch (error) {
       console.error('Failed to fetch alerts:', error);
-      setAlerts([]);
+      
+      // Fallback to local only on error
+      const localAlertsStr = localStorage.getItem('localAlerts');
+      if (localAlertsStr) {
+         setAlerts(JSON.parse(localAlertsStr));
+      } else {
+         setAlerts([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -74,17 +98,17 @@ const AlertsPage: React.FC = () => {
     <div className="alerts-page">
       <div className="page-header">
         <div className="header-content">
-          <h1>Alerts</h1>
-          <p className="header-subtitle">Monitor and manage system alerts</p>
+          <h1>{t('alerts')}</h1>
+          <p className="header-subtitle">{t('monitorAndManageAlerts')}</p>
         </div>
         <div className="header-actions">
           <button className="btn btn-secondary" onClick={handleMarkAllAsRead}>
             <CheckCheck size={16} />
-            Mark All Read
+            {t('markAllRead')}
           </button>
           <button className="btn btn-primary" onClick={fetchAlerts}>
             <RefreshCw size={16} />
-            Refresh
+            {t('refresh')}
           </button>
         </div>
       </div>
@@ -93,23 +117,34 @@ const AlertsPage: React.FC = () => {
         <div className="summary-card critical">
           <AlertTriangle size={24} />
           <span className="summary-value">{criticalCount}</span>
-          <span className="summary-label">Critical</span>
+          <span className="summary-label">{t('critical')}</span>
         </div>
         <div className="summary-card warning">
           <AlertCircle size={24} />
           <span className="summary-value">{warningCount}</span>
-          <span className="summary-label">Warning</span>
+          <span className="summary-label">{t('warning')}</span>
         </div>
         <div className="summary-card info">
           <Info size={24} />
           <span className="summary-value">{infoCount}</span>
-          <span className="summary-label">Info</span>
+          <span className="summary-label">{t('info')}</span>
         </div>
         <div className="summary-card unread">
           <Bell size={24} />
           <span className="summary-value">{unreadCount}</span>
-          <span className="summary-label">Unread</span>
+          <span className="summary-label">{t('unread')}</span>
         </div>
+      </div>
+
+      <div className="alerts-chart-section" style={{ marginTop: '20px', marginBottom: '20px' }}>
+         <DetectionPieChart 
+            data={[
+              { objectType: t('critical'), count: criticalCount, averageConfidence: 0 },
+              { objectType: t('warning'), count: warningCount, averageConfidence: 0 },
+              { objectType: t('info'), count: infoCount, averageConfidence: 0 }
+            ].filter(d => d.count > 0)} 
+            title={t('alertDistribution')} 
+         />
       </div>
 
       <div className="alerts-controls">
@@ -118,25 +153,25 @@ const AlertsPage: React.FC = () => {
             className={`filter-btn ${severityFilter === 'all' ? 'active' : ''}`}
             onClick={() => setSeverityFilter('all')}
           >
-            All
+            {t('all')}
           </button>
           <button 
             className={`filter-btn critical ${severityFilter === 'critical' ? 'active' : ''}`}
             onClick={() => setSeverityFilter('critical')}
           >
-            Critical
+            {t('critical')}
           </button>
           <button 
             className={`filter-btn warning ${severityFilter === 'warning' ? 'active' : ''}`}
             onClick={() => setSeverityFilter('warning')}
           >
-            Warning
+            {t('warning')}
           </button>
           <button 
             className={`filter-btn info ${severityFilter === 'info' ? 'active' : ''}`}
             onClick={() => setSeverityFilter('info')}
           >
-            Info
+            {t('info')}
           </button>
         </div>
 
@@ -146,7 +181,7 @@ const AlertsPage: React.FC = () => {
             checked={showUnreadOnly}
             onChange={(e) => setShowUnreadOnly(e.target.checked)}
           />
-          <span>Show unread only</span>
+          <span>{t('showUnreadOnly')}</span>
         </label>
       </div>
 
@@ -172,8 +207,8 @@ const AlertsPage: React.FC = () => {
       {!loading && filteredAlerts.length === 0 && (
         <div className="empty-state">
           <Bell size={48} />
-          <h3>No alerts</h3>
-          <p>All caught up! No alerts match your current filters.</p>
+          <h3>{t('noAlerts')}</h3>
+          <p>{t('allCaughtUp')}</p>
         </div>
       )}
     </div>

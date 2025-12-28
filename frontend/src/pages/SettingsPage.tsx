@@ -14,6 +14,7 @@ import {
   Moon,
   Sun
 } from 'lucide-react';
+import { useApp } from '../i18n/AppContext';
 import './SettingsPage.css';
 
 type TabType = 'azure' | 'notifications' | 'model' | 'system' | 'users';
@@ -56,6 +57,7 @@ interface SystemSettings {
 }
 
 const SettingsPage: React.FC = () => {
+  const { language, setLanguage, theme, setTheme, t } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('azure');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   
@@ -88,13 +90,29 @@ const SettingsPage: React.FC = () => {
   });
 
   const [systemSettings, setSystemSettings] = useState<SystemSettings>({
-    language: 'en',
+    language: language,
     timezone: 'Asia/Jakarta',
-    theme: 'dark',
+    theme: theme,
     dataRetentionDays: 90,
     enableAnalytics: true,
     autoRefreshInterval: 30
   });
+
+  // Load settings from localStorage on mount
+  React.useEffect(() => {
+    const savedAzure = localStorage.getItem('neuralens_azure_config');
+    const savedNotifications = localStorage.getItem('neuralens_notifications');
+    const savedModel = localStorage.getItem('neuralens_model_settings');
+    const savedSystem = localStorage.getItem('neuralens_system_settings');
+
+    if (savedAzure) setAzureConfig(JSON.parse(savedAzure));
+    if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
+    if (savedModel) setModelSettings(JSON.parse(savedModel));
+    if (savedSystem) {
+      const parsed = JSON.parse(savedSystem);
+      setSystemSettings(parsed);
+    }
+  }, []);
 
   const handleSave = async () => {
     setSaveStatus('saving');
@@ -103,8 +121,18 @@ const SettingsPage: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     try {
+      // Save to localStorage
+      localStorage.setItem('neuralens_azure_config', JSON.stringify(azureConfig));
+      localStorage.setItem('neuralens_notifications', JSON.stringify(notifications));
+      localStorage.setItem('neuralens_model_settings', JSON.stringify(modelSettings));
+      localStorage.setItem('neuralens_system_settings', JSON.stringify(systemSettings));
+
+      // Update global context (this will also apply theme)
+      setLanguage(systemSettings.language as any);
+      setTheme(systemSettings.theme);
+
       // Here you would make actual API calls to save settings
-      console.log('Saving settings:', {
+      console.log('Settings saved:', {
         azure: azureConfig,
         notifications,
         model: modelSettings,
@@ -124,8 +152,8 @@ const SettingsPage: React.FC = () => {
       <div className="section-header">
         <Cloud size={24} />
         <div>
-          <h2>Azure Configuration</h2>
-          <p>Configure your Azure IoT Hub, Blob Storage, and Cosmos DB connections</p>
+          <h2>{t('azureConfiguration')}</h2>
+          <p>{t('azureConfigDesc')}</p>
         </div>
       </div>
 
@@ -133,47 +161,47 @@ const SettingsPage: React.FC = () => {
         <div className="form-group full-width">
           <label>
             <Database size={18} />
-            IoT Hub Connection String
+            {t('iotHubConnectionString')}
           </label>
           <input
             type="password"
             value={azureConfig.iotHubConnectionString}
             onChange={(e) => setAzureConfig({...azureConfig, iotHubConnectionString: e.target.value})}
-            placeholder="HostName=your-hub.azure-devices.net;SharedAccessKeyName=..."
+            placeholder={t('iotHubPlaceholder')}
           />
-          <span className="helper-text">Connection string for Azure IoT Hub</span>
+          <span className="helper-text">{t('iotHubDesc')}</span>
         </div>
 
         <div className="form-group full-width">
           <label>
             <Database size={18} />
-            Blob Storage Connection String
+            {t('blobStorageConnectionString')}
           </label>
           <input
             type="password"
             value={azureConfig.blobStorageConnectionString}
             onChange={(e) => setAzureConfig({...azureConfig, blobStorageConnectionString: e.target.value})}
-            placeholder="DefaultEndpointsProtocol=https;AccountName=..."
+            placeholder={t('blobStoragePlaceholder')}
           />
-          <span className="helper-text">Connection string for Azure Blob Storage (video/image storage)</span>
+          <span className="helper-text">{t('blobStorageDesc')}</span>
         </div>
 
         <div className="form-group full-width">
           <label>
             <Database size={18} />
-            Cosmos DB Connection String
+            {t('cosmosDbConnectionString')}
           </label>
           <input
             type="password"
             value={azureConfig.cosmosDbConnectionString}
             onChange={(e) => setAzureConfig({...azureConfig, cosmosDbConnectionString: e.target.value})}
-            placeholder="AccountEndpoint=https://...;AccountKey=..."
+            placeholder={t('cosmosDbPlaceholder')}
           />
-          <span className="helper-text">Connection string for Azure Cosmos DB (detection data storage)</span>
+          <span className="helper-text">{t('cosmosDbDesc')}</span>
         </div>
 
         <div className="form-group">
-          <label>Database Name</label>
+          <label>{t('databaseName')}</label>
           <input
             type="text"
             value={azureConfig.cosmosDbDatabaseName}
@@ -198,8 +226,8 @@ const SettingsPage: React.FC = () => {
       <div className="section-header">
         <Bell size={24} />
         <div>
-          <h2>Notification Preferences</h2>
-          <p>Configure alert thresholds and notification channels</p>
+          <h2>{t('notificationPreferences')}</h2>
+          <p>{t('notificationPrefDesc')}</p>
         </div>
       </div>
 
@@ -208,8 +236,8 @@ const SettingsPage: React.FC = () => {
           <div className="toggle-group">
             <div className="toggle-item">
               <div>
-                <label>Email Notifications</label>
-                <span className="helper-text">Receive alerts via email</span>
+                <label>{t('emailNotifications')}</label>
+                <span className="helper-text">{t('receiveAlertsViaEmail')}</span>
               </div>
               <label className="toggle">
                 <input
@@ -225,7 +253,7 @@ const SettingsPage: React.FC = () => {
 
         {notifications.emailEnabled && (
           <div className="form-group full-width">
-            <label>Email Address</label>
+            <label>{t('emailAddress')}</label>
             <input
               type="email"
               value={notifications.emailAddress}
@@ -239,8 +267,8 @@ const SettingsPage: React.FC = () => {
           <div className="toggle-group">
             <div className="toggle-item">
               <div>
-                <label>SMS Notifications</label>
-                <span className="helper-text">Receive critical alerts via SMS</span>
+                <label>{t('smsNotifications')}</label>
+                <span className="helper-text">{t('receiveCriticalAlertsSMS')}</span>
               </div>
               <label className="toggle">
                 <input
@@ -256,7 +284,7 @@ const SettingsPage: React.FC = () => {
 
         {notifications.smsEnabled && (
           <div className="form-group full-width">
-            <label>Phone Number</label>
+            <label>{t('phoneNumber')}</label>
             <input
               type="tel"
               value={notifications.phoneNumber}
@@ -267,7 +295,7 @@ const SettingsPage: React.FC = () => {
         )}
 
         <div className="form-group full-width">
-          <label>Alert Threshold (%)</label>
+          <label>{t('alertThreshold')}</label>
           <div className="slider-container">
             <input
               type="range"
@@ -278,11 +306,11 @@ const SettingsPage: React.FC = () => {
             />
             <span className="slider-value">{notifications.alertThreshold}%</span>
           </div>
-          <span className="helper-text">Minimum confidence level to trigger alerts</span>
+          <span className="helper-text">{t('minimumConfidenceAlert')}</span>
         </div>
 
         <div className="form-group full-width">
-          <label>Alert Types</label>
+          <label>{t('alertTypes')}</label>
           <div className="checkbox-group">
             <label className="checkbox-item">
               <input
@@ -290,7 +318,7 @@ const SettingsPage: React.FC = () => {
                 checked={notifications.highRiskBehaviorAlert}
                 onChange={(e) => setNotifications({...notifications, highRiskBehaviorAlert: e.target.checked})}
               />
-              <span>High Risk Behavior Detected</span>
+              <span>{t('highRiskBehaviorDetected')}</span>
             </label>
             <label className="checkbox-item">
               <input
@@ -298,7 +326,7 @@ const SettingsPage: React.FC = () => {
                 checked={notifications.deviceOfflineAlert}
                 onChange={(e) => setNotifications({...notifications, deviceOfflineAlert: e.target.checked})}
               />
-              <span>Device Offline</span>
+              <span>{t('deviceOffline')}</span>
             </label>
             <label className="checkbox-item">
               <input
@@ -306,7 +334,7 @@ const SettingsPage: React.FC = () => {
                 checked={notifications.lowAccuracyAlert}
                 onChange={(e) => setNotifications({...notifications, lowAccuracyAlert: e.target.checked})}
               />
-              <span>Low Detection Accuracy</span>
+              <span>{t('lowDetectionAccuracy')}</span>
             </label>
           </div>
         </div>
@@ -319,38 +347,38 @@ const SettingsPage: React.FC = () => {
       <div className="section-header">
         <Brain size={24} />
         <div>
-          <h2>Detection Model Settings</h2>
-          <p>Configure AI model behavior and detection parameters</p>
+          <h2>{t('detectionModelSettings')}</h2>
+          <p>{t('modelSettingsDesc')}</p>
         </div>
       </div>
 
       <div className="form-grid">
         <div className="form-group">
-          <label>Model Version</label>
+          <label>{t('modelVersion')}</label>
           <select
             value={modelSettings.modelVersion}
             onChange={(e) => setModelSettings({...modelSettings, modelVersion: e.target.value})}
           >
-            <option value="v2.3.1">v2.3.1 (Latest)</option>
+            <option value="v2.3.1">v2.3.1 ({t('latestVersion')})</option>
             <option value="v2.3.0">v2.3.0</option>
             <option value="v2.2.5">v2.2.5</option>
           </select>
         </div>
 
         <div className="form-group">
-          <label>Inference Mode</label>
+          <label>{t('inferenceMode')}</label>
           <select
             value={modelSettings.inferenceMode}
             onChange={(e) => setModelSettings({...modelSettings, inferenceMode: e.target.value as any})}
           >
-            <option value="fast">Fast (Lower accuracy, faster processing)</option>
-            <option value="balanced">Balanced (Recommended)</option>
-            <option value="accurate">Accurate (Higher accuracy, slower processing)</option>
+            <option value="fast">{t('fastInference')}</option>
+            <option value="balanced">{t('balancedRecommended')}</option>
+            <option value="accurate">{t('accurateInference')}</option>
           </select>
         </div>
 
         <div className="form-group full-width">
-          <label>Detection Confidence Threshold (%)</label>
+          <label>{t('detectionConfidenceThreshold')}</label>
           <div className="slider-container">
             <input
               type="range"
@@ -361,15 +389,15 @@ const SettingsPage: React.FC = () => {
             />
             <span className="slider-value">{modelSettings.detectionConfidenceThreshold}%</span>
           </div>
-          <span className="helper-text">Minimum confidence level for valid detections</span>
+          <span className="helper-text">{t('minimumConfidenceValid')}</span>
         </div>
 
         <div className="form-group full-width">
           <div className="toggle-group">
             <div className="toggle-item">
               <div>
-                <label>Auto-Update Model</label>
-                <span className="helper-text">Automatically deploy new model versions</span>
+                <label>{t('autoUpdateModel')}</label>
+                <span className="helper-text">{t('autoDeployNewVersions')}</span>
               </div>
               <label className="toggle">
                 <input
@@ -384,7 +412,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         <div className="form-group full-width">
-          <label>Detection Types</label>
+          <label>{t('detectionTypes')}</label>
           <div className="checkbox-group">
             <label className="checkbox-item">
               <input
@@ -392,7 +420,7 @@ const SettingsPage: React.FC = () => {
                 checked={modelSettings.enableADHDDetection}
                 onChange={(e) => setModelSettings({...modelSettings, enableADHDDetection: e.target.checked})}
               />
-              <span>ADHD Detection (Attention Deficit/Hyperactivity)</span>
+              <span>{t('adhdDetection')}</span>
             </label>
             <label className="checkbox-item">
               <input
@@ -400,7 +428,7 @@ const SettingsPage: React.FC = () => {
                 checked={modelSettings.enableASDDetection}
                 onChange={(e) => setModelSettings({...modelSettings, enableASDDetection: e.target.checked})}
               />
-              <span>ASD Detection (Autism Spectrum Disorder)</span>
+              <span>{t('asdDetection')}</span>
             </label>
           </div>
         </div>
@@ -413,8 +441,8 @@ const SettingsPage: React.FC = () => {
       <div className="section-header">
         <SettingsIcon size={24} />
         <div>
-          <h2>System Preferences</h2>
-          <p>Configure general system settings and preferences</p>
+          <h2>{t('systemPreferences')}</h2>
+          <p>{t('systemPrefDesc')}</p>
         </div>
       </div>
 
@@ -422,7 +450,7 @@ const SettingsPage: React.FC = () => {
         <div className="form-group">
           <label>
             <Globe size={18} />
-            Language
+            {t('language')}
           </label>
           <select
             value={systemSettings.language}
@@ -430,39 +458,82 @@ const SettingsPage: React.FC = () => {
           >
             <option value="en">English</option>
             <option value="id">Bahasa Indonesia</option>
+            <option value="zh">中文 (Chinese)</option>
+            <option value="es">Español (Spanish)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="ar">العربية (Arabic)</option>
+            <option value="pt">Português (Portuguese)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="ru">Русский (Russian)</option>
+            <option value="ja">日本語 (Japanese)</option>
+            <option value="de">Deutsch (German)</option>
+            <option value="fr">Français (French)</option>
+            <option value="ko">한국어 (Korean)</option>
+            <option value="vi">Tiếng Việt (Vietnamese)</option>
+            <option value="th">ไทย (Thai)</option>
+            <option value="tl">Tagalog (Filipino)</option>
           </select>
         </div>
 
         <div className="form-group">
-          <label>Timezone</label>
+          <label>{t('timezone')}</label>
           <select
             value={systemSettings.timezone}
             onChange={(e) => setSystemSettings({...systemSettings, timezone: e.target.value})}
           >
-            <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
-            <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
-            <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
-            <option value="UTC">UTC</option>
+            <optgroup label="Asia">
+              <option value="Asia/Jakarta">Jakarta (WIB, GMT+7)</option>
+              <option value="Asia/Makassar">Makassar (WITA, GMT+8)</option>
+              <option value="Asia/Jayapura">Jayapura (WIT, GMT+9)</option>
+              <option value="Asia/Singapore">Singapore (GMT+8)</option>
+              <option value="Asia/Manila">Manila (GMT+8)</option>
+              <option value="Asia/Bangkok">Bangkok (GMT+7)</option>
+              <option value="Asia/Tokyo">Tokyo (GMT+9)</option>
+              <option value="Asia/Seoul">Seoul (GMT+9)</option>
+              <option value="Asia/Shanghai">Shanghai (GMT+8)</option>
+              <option value="Asia/Hong_Kong">Hong Kong (GMT+8)</option>
+              <option value="Asia/Kolkata">Kolkata (GMT+5:30)</option>
+              <option value="Asia/Dubai">Dubai (GMT+4)</option>
+            </optgroup>
+            <optgroup label="Europe">
+              <option value="Europe/London">London (GMT+0)</option>
+              <option value="Europe/Paris">Paris (GMT+1)</option>
+              <option value="Europe/Berlin">Berlin (GMT+1)</option>
+              <option value="Europe/Moscow">Moscow (GMT+3)</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="America/New_York">New York (GMT-5)</option>
+              <option value="America/Chicago">Chicago (GMT-6)</option>
+              <option value="America/Los_Angeles">Los Angeles (GMT-8)</option>
+              <option value="America/Sao_Paulo">São Paulo (GMT-3)</option>
+            </optgroup>
+            <optgroup label="Pacific">
+              <option value="Australia/Sydney">Sydney (GMT+11)</option>
+              <option value="Pacific/Auckland">Auckland (GMT+13)</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="UTC">UTC (GMT+0)</option>
+            </optgroup>
           </select>
         </div>
 
         <div className="form-group">
           <label>
             {systemSettings.theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
-            Theme
+            {t('theme')}
           </label>
           <select
             value={systemSettings.theme}
             onChange={(e) => setSystemSettings({...systemSettings, theme: e.target.value as any})}
           >
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-            <option value="auto">Auto (System)</option>
+            <option value="light">{t('light')}</option>
+            <option value="dark">{t('dark')}</option>
+            <option value="auto">{t('auto')}</option>
           </select>
         </div>
 
         <div className="form-group">
-          <label>Auto Refresh Interval (seconds)</label>
+          <label>{t('autoRefreshInterval')}</label>
           <input
             type="number"
             min="10"
@@ -473,7 +544,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label>Data Retention (days)</label>
+          <label>{t('dataRetention')}</label>
           <input
             type="number"
             min="30"
@@ -481,15 +552,15 @@ const SettingsPage: React.FC = () => {
             value={systemSettings.dataRetentionDays}
             onChange={(e) => setSystemSettings({...systemSettings, dataRetentionDays: parseInt(e.target.value)})}
           />
-          <span className="helper-text">How long to keep detection records</span>
+          <span className="helper-text">{t('dataRetentionDesc')}</span>
         </div>
 
         <div className="form-group full-width">
           <div className="toggle-group">
             <div className="toggle-item">
               <div>
-                <label>Enable Analytics</label>
-                <span className="helper-text">Collect anonymous usage data to improve the system</span>
+                <label>{t('enableAnalytics')}</label>
+                <span className="helper-text">{t('collectAnonymousData')}</span>
               </div>
               <label className="toggle">
                 <input
@@ -511,26 +582,26 @@ const SettingsPage: React.FC = () => {
       <div className="section-header">
         <Users size={24} />
         <div>
-          <h2>User Management</h2>
-          <p>Manage user accounts and access permissions</p>
+          <h2>{t('userManagement')}</h2>
+          <p>{t('userManagementDesc')}</p>
         </div>
       </div>
 
       <div className="info-banner">
         <AlertCircle size={20} />
         <div>
-          <strong>Coming Soon</strong>
-          <p>User management features will be available in the next update. You'll be able to manage user accounts, roles, and permissions.</p>
+          <strong>{t('comingSoon')}</strong>
+          <p>{t('userManagementComingSoon')}</p>
         </div>
       </div>
 
       <div className="user-list-placeholder">
         <Lock size={48} />
-        <h3>User Management</h3>
-        <p>Add and manage users with different access levels</p>
+        <h3>{t('userManagement')}</h3>
+        <p>{t('addAndManageUsers')}</p>
         <button className="btn btn-secondary" disabled>
           <Users size={16} />
-          Add New User
+          {t('addNewUser')}
         </button>
       </div>
     </div>
@@ -540,7 +611,7 @@ const SettingsPage: React.FC = () => {
     <div className="settings-page">
       <div className="page-header">
         <div className="header-content">
-          <h1>Settings</h1>
+          <h1>{t('settings')}</h1>
           <p className="header-subtitle">Configure system preferences and integrations</p>
         </div>
         <button 
@@ -549,21 +620,21 @@ const SettingsPage: React.FC = () => {
           disabled={saveStatus === 'saving'}
         >
           <Save size={16} />
-          {saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
+          {saveStatus === 'saving' ? t('saving') : t('saveChanges')}
         </button>
       </div>
 
       {saveStatus === 'success' && (
         <div className="alert alert-success">
           <CheckCircle size={20} />
-          <span>Settings saved successfully!</span>
+          <span>{t('settingsSaved')}</span>
         </div>
       )}
 
       {saveStatus === 'error' && (
         <div className="alert alert-error">
           <AlertCircle size={20} />
-          <span>Failed to save settings. Please try again.</span>
+          <span>{t('settingsSaveFailed')}</span>
         </div>
       )}
 
@@ -573,35 +644,35 @@ const SettingsPage: React.FC = () => {
           onClick={() => setActiveTab('azure')}
         >
           <Cloud size={18} />
-          Azure Config
+          {t('azureConfiguration')}
         </button>
         <button 
           className={`tab-button ${activeTab === 'notifications' ? 'active' : ''}`}
           onClick={() => setActiveTab('notifications')}
         >
           <Bell size={18} />
-          Notifications
+          {t('notificationPreferences')}
         </button>
         <button 
           className={`tab-button ${activeTab === 'model' ? 'active' : ''}`}
           onClick={() => setActiveTab('model')}
         >
           <Brain size={18} />
-          Detection Model
+          {t('detectionModelSettings')}
         </button>
         <button 
           className={`tab-button ${activeTab === 'system' ? 'active' : ''}`}
           onClick={() => setActiveTab('system')}
         >
           <SettingsIcon size={18} />
-          System
+          {t('systemPreferences')}
         </button>
         <button 
           className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
           onClick={() => setActiveTab('users')}
         >
           <Users size={18} />
-          Users
+          {t('userManagement')}
         </button>
       </div>
 
